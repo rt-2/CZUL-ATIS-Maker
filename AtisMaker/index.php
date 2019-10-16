@@ -16,46 +16,50 @@ define('DEBUG', false);
 $GLOBALS['cityNames_array'] = [
 	'CYUL' => [
 		'en' => 'Montreal International Airport',
-		'fr' => 'Aéroport International de Montréal',
+		'fr' => 'AÃ©roport International de MontrÃ©al',
 	],
 	'CYQB' => [
-		'en' => 'Québec International Airport',
-		'fr' => 'Aéroport International de Québec',
+		'en' => 'QuÃ©bec International Airport',
+		'fr' => 'AÃ©roport International de QuÃ©bec',
 	],
 	'CYOW' => [
 		'en' => 'Ottawa International Airport',
-		'fr' => 'Aéroport International d\'Ottawa',
+		'fr' => 'AÃ©roport International d\'Ottawa',
 	],
 ];
 $GLOBALS['notams_array'] = [
 	'CYUL' => [
 		191072 => [
-			'en' => 'Taxiway '. WrapLetter('E') .' closed between runway 06L/24R and taxiway '. WrapLetter('B'),
-			'fr' => 'Taxiway '. WrapLetter('E') .' fermé entre la piste 06G/24D et le taxiway '. WrapLetter('B'),
+			'en' => 'TWY E BTN RWY 06L/24R AND TWY B CLSD',
+			//'fr' => 'Taxiway '. WrapLetter('E') .' fermÃ© entre la piste 06G/24D et le taxiway '. WrapLetter('B'),
 		],
 		191510 => [
-			"en" => "First ".WrapNumber("2948")."ft of runway 06L closed",
-			"fr" => "Premier ".WrapNumber("2948")."ft de la piste 06G fermé",
+			"en" => 'FIRST 2948FT RWY 06L CLSD',
+			//"fr" => "Premier ".WrapNumber("2948")."ft de la piste 06G fermÃ©",
 		],
 		191538 => [
-			"en" => "Runway 10/28 closed, available as taxiway",
-			"fr" => "Piste 10/28 fermé, disponble comme taxiway",
+			"en" => "RWY 10/28 CLSD AVBL AS TWY",
+			//"fr" => "Piste 10/28 fermÃ©, disponble comme taxiway",
+		],
+		[
+			"en" => "TWY G CLSD",
+			//"fr" => "Piste 10/28 fermÃ©, disponble comme taxiway",
 		],
 	],
 	"CYHU" => [
 		190430 => [
 			"en" => "Runway 10/28 closed, available as taxiway",
-			"fr" => "Piste 10/28 fermé, disponble comme taxiway",
+			//"fr" => "Piste 10/28 fermÃ©, disponble comme taxiway",
 		],
 	],
 	"CYMX" => [
 		190459 => [
 			"en" => "Runway 11/29 closed between sunset and sunrise",
-			"fr" => "Piste 11/29 fermé entre le crépuscule et soir et le crépuscule du matin",
+			//"fr" => "Piste 11/29 fermÃ© entre le crÃ©puscule et soir et le crÃ©puscule du matin",
 		],
 		190465 => [
 			"en" => "Taxiway ".WrapLetter("A")." closed between taxiway ".WrapLetter("H")." and holding bay 11",
-			"fr" => "Taxiway ".WrapLetter("A")." fermé entre le taxiway ".WrapLetter("H")." et l\'air d\'attente piste 11",
+			//"fr" => "Taxiway ".WrapLetter("A")." fermÃ© entre le taxiway ".WrapLetter("H")." et l\'air d\'attente piste 11",
 		],
 	],
 ];
@@ -300,14 +304,14 @@ foreach($thisArptNotams as $notam)
 $outputEnglishText .= 'Advise ATC that you have information '.WrapLetter($infoLetter).'.';
 
 $outputFrenchText = ''.GetAirportNameString($airportICAO, 'fr').' information '.$infoLetter.'[,] ';
-$outputFrenchText .= 'météo à '.$infoZuluTime.', ';
-$outputFrenchText .= 'vent '.$windDirection.' à '.WrapNumber($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales à '.WrapNumber($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? ' variant entre '.$windVariatonList[0].' et '.$windVariatonList[1] : '').', ';
-$outputFrenchText .= 'visibilité '.$visibility.', ';
+$outputFrenchText .= 'mÃ©tÃ©o Ã  '.$infoZuluTime.', ';
+$outputFrenchText .= 'vent '.$windDirection.' Ã  '.WrapNumber($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales Ã  '.WrapNumber($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? ' variant entre '.$windVariatonList[0].' et '.$windVariatonList[1] : '').', ';
+$outputFrenchText .= 'visibilitÃ© '.$visibility.', ';
 $outputFrenchText .= (strlen($precipitations_segmentStr) > 0 ? $precipitations_segmentStr.', ' : '');
 $outputFrenchText .= (strlen($cloudLayers_segmentStr) > 0 ? $cloudLayers_segmentStr.', ' : 'Sky clear, ');
 
-$outputFrenchText .= 'température '.+$temp_celcius.', point de rosée '.+$temp_dewpoint.', ';
-$outputFrenchText .= 'altimètre '.$altimeter_hg.', '."\r";
+$outputFrenchText .= 'tempÃ©rature '.+$temp_celcius.', point de rosÃ©e '.+$temp_dewpoint.', ';
+$outputFrenchText .= 'altimÃ¨tre '.$altimeter_hg.', '."\r";
 $outputFrenchText .= 'approches IFR '.GetAirportAppRwysString($app_rwys, $app_type, 'fr').', ';
 $outputFrenchText .= 'departs '.GetAirportDepRwysString($dep_rwys, 'fr').'[.] ';
 foreach($thisArptNotams as $notam)
