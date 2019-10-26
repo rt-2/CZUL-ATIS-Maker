@@ -88,7 +88,6 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 	
 	$metar_regex .= $metarMainPart_obj->regex.'\s?';
 }
-
 /*
 
 $main_local_regex.'\s?'.$main_wind_regex.'\s?'.$main_visibility_regex.'\s?'.$main_precipitation_regex.'\s?'.$main_cloud_regex.'\s?'.$main_temp_regex.'\s?'.$main_altimeter_regex.'\s?RMK\s'.$main_remark_regex;
@@ -269,11 +268,14 @@ function GetAirportAppRwysString($app_rwys, $app_type, $lang)
 	}
 	return implode(($lang === 'fr'? ' et ': ' and '), $app_rwys_list);
 }
-$windDirection += 20;
-$windDirection = ($windDirection > 360)? $windDirection - 360 : $windDirection;
-while(strlen($windDirection) < 3)
+if(strtoupper($windDirection) !== 'VRB')
 {
-	$windDirection = '0'.$windDirection;
+    $windDirection += 20;
+    $windDirection = ($windDirection > 360)? $windDirection - 360 : $windDirection;
+    while(strlen($windDirection) < 3)
+    {
+	    $windDirection = '0'.$windDirection;
+    }
 }
 $thisArptNotams = [];
 if(in_array($airportICAO, array_keys($GLOBALS['notams_array'])))
