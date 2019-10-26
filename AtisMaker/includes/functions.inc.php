@@ -10,12 +10,11 @@ function WrapNumber($infoNumber)
 function WrapNumberForBetaTempPKM($infoNumber)
 {
     $return_str = '';
-    $length = strlen($infoNumber);
-    $thisWordCodeVerdeeld = array();
-    for ($i=0; $i<$length; $i++) {
-        $return_str .= (($i>0)?'*':'').$infoNumber[$i];
+    $length = strlen((string)$infoNumber);
+    for ($i=0; $i < $length; $i++) {
+        $return_str .= ( ($i > 0)?'*':'' ).$infoNumber[$i];
     }
-	return '*'.$infoNumber;
+	return $return_str;
 };
 function GetPrecipitationDescriptionStrings($precipitation_descr)
 {

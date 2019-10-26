@@ -158,7 +158,9 @@ function GetAirportNameString($icao, $lang)
 	return $return_value;
 }
 $infoLetter = $_GET['info'];
-$infoZuluTime = str_replace('Z', '*Z', MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str);
+//$infoZuluTime = str_replace('Z', '*Z', MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str);
+$infoZuluTime = MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str;
+$infoZuluTime = WrapNumberForBetaTempPKM($infoZuluTime);
 $windDirection = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str;
 $windVariaton = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str;
 $windVariatonList = explode('V', $windVariaton);
@@ -288,7 +290,6 @@ if(DEBUG)
 	echo '== FINAL ATIS ==';
 	echo "\n\n";
 }
-$infoZuluTime = WrapNumberForBetaTempPKM($infoZuluTime);
 $outputEnglishText = GetAirportNameString($airportICAO, 'en').' information '.WrapLetter($infoLetter)." , ";
 $outputEnglishText .= 'weather at '.$infoZuluTime.". ";
 $outputEnglishText .= 'wind '.$windDirection.' at '.WrapNumber($windSpeed_kts).($windSpeed_gust > 0 ? ' , gusting '.WrapNumber($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " , varying between ".$windVariatonList[0].' and '.$windVariatonList[1] : '').". ";
