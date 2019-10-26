@@ -269,7 +269,6 @@ function GetAirportAppRwysString($app_rwys, $app_type, $lang)
 	}
 	return implode(($lang === 'fr'? ' et ': ' and '), $app_rwys_list);
 }
-$windDirection = +$metarMatches['wind_dir'][0];
 $windDirection += 20;
 $windDirection = ($windDirection > 360)? $windDirection - 360 : $windDirection;
 while(strlen($windDirection) < 3)
