@@ -3,22 +3,38 @@ function WrapLetter($infoLetter)
 {
 	return '*'.$infoLetter;
 };
-function WrapNumber($infoNumber)
+function WrapNumberWhole($infoNumber)
 {
 	return '*'.$infoNumber;
 };
-function WrapNumberForBetaTempPKM($infoNumber)
+function WrapNumberSpell($infoNumber)
 {
     $return_str = '';
-    $length = strlen((string)$infoNumber);
-    for ($i=0; $i < $length; $i++) {
-        $return_str .= ( ($i > 0)?'*':'' ).$infoNumber[$i];
+    $num_for_str_results = (string)$infoNumber;
+    $num_for_str_tests = preg_replace ( "/^0*(?=[0-9]+)/" , '' , $num_for_str_results );
+    $num_for_int_tests = +$infoNumber;
+    $num_negative = ($num_for_int_tests < 0)? true : false;
+    if((string)+$num_for_str_tests === (string)$num_for_str_tests)
+    {
+        $length = strlen($num_for_str_results);
+        for ($i=0; $i < $length; $i++) {
+            $return_str .= "\t*".+$num_for_str_results[$i];
+        }
+        if($num_negative)
+        {
+            $return_str= 'minus '.$return_str;
+        }
+    }
+    else
+    {
+    
+	    $return_str = $num_for_str_results;
     }
 	return $return_str;
 };
 function GetPrecipitationDescriptionStrings($precipitation_descr)
 {
-	$precipitation_descr_strings = null;
+	$precipitation_descr_strings = null; 
 	switch($precipitation_descr)
 	{
 		case 'BC':

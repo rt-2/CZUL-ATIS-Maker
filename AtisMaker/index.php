@@ -35,7 +35,7 @@ $GLOBALS['notams_array'] = [
 		],
 		191510 => [
 			"en" => 'FIRST 2948FT RWY 06L CLSD',
-			//"fr" => "Premier ".WrapNumber("2948")."ft de la piste 06G fermé",
+			//"fr" => "Premier ".WrapNumberWhole("2948")."ft de la piste 06G fermé",
 		],
 		191538 => [
 			"en" => "RWY 10/28 CLSD AVBL AS TWY",
@@ -119,7 +119,7 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 
 
 
-MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','issue_date','issue_time'], '^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4}Z)$');
+MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','issue_date','issue_time'], '^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$');
 MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '^(?P<wind_degree>\w{3})(?P<wind_speed>\w{2}(?:G\w{2})?KT)(?:\s(?P<wind_variaton>\d{3}V\d{3}))?$');
 
 
@@ -158,9 +158,7 @@ function GetAirportNameString($icao, $lang)
 	return $return_value;
 }
 $infoLetter = $_GET['info'];
-//$infoZuluTime = str_replace('Z', '*Z', MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str);
-$infoZuluTime = MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str;
-$infoZuluTime = WrapNumberForBetaTempPKM($infoZuluTime);
+$infoZuluTime = str_replace('Z', '*Z', MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str);
 $windDirection = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str;
 $windVariaton = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str;
 $windVariatonList = explode('V', $windVariaton);
@@ -221,7 +219,7 @@ $cloudLayers_segmentStr = '';
 foreach($clouds_array as $cloudLayer)
 {
 	$type = substr($cloudLayer, 0, 3);
-	$alt = WrapNumber((+substr($cloudLayer, 3, 3)).'00');
+	$alt = WrapNumberWhole((+substr($cloudLayer, 3, 3)).'00');
 	$retStr = '';
 	switch($type)
 	{
@@ -243,8 +241,8 @@ foreach($clouds_array as $cloudLayer)
 $cloudLayers_segmentStr = implode(" , ", $cloudLayers_segmentArr);
 $temps = MetarMainPart::$allMetarMainPartsByNames['temps']->result_str;
 $temps_array = explode("/", str_replace("M", "-", $temps));
-$temp_celcius = preg_replace('((?=0)\d)', '$1', $temps_array[0]);
-$temp_dewpoint = preg_replace('((?=0)\d)', '$1', $temps_array[1]);
+$temp_celcius = +preg_replace('((?=0)\d)', '$1', $temps_array[0]);
+$temp_dewpoint = +preg_replace('((?=0)\d)', '$1', $temps_array[1]);
 $altimeter_hg = substr(MetarMainPart::$allMetarMainPartsByNames['altimeter']->result_str, 1);
 $dep_rwys = $_GET['dep'];
 $dep_rwys_str = '';
@@ -291,13 +289,14 @@ if(DEBUG)
 	echo "\n\n";
 }
 $outputEnglishText = GetAirportNameString($airportICAO, 'en').' information '.WrapLetter($infoLetter)." , ";
-$outputEnglishText .= 'weather at '.$infoZuluTime.". ";
-$outputEnglishText .= 'wind '.$windDirection.' at '.WrapNumber($windSpeed_kts).($windSpeed_gust > 0 ? ' , gusting '.WrapNumber($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " , varying between ".$windVariatonList[0].' and '.$windVariatonList[1] : '').". ";
-$outputEnglishText .= 'visibility '.$visibility;
+$outputEnglishText .= 'weather at '.WrapNumberSpell($infoZuluTime)."*Z. ";
+$outputEnglishText .= 'wind '.WrapNumberSpell($windDirection).' at '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' , gusting '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " , varying between ".$windVariatonList[0].' and '.$windVariatonList[1] : '').". ";
+$outputEnglishText .= 'visibility '.WrapNumberSpell($visibility);
 $outputEnglishText .= (strlen($precipitations_segmentStr) > 0 ? " , ".$precipitations_segmentStr.'. ' : ". ");
 $outputEnglishText .= (strlen($cloudLayers_segmentStr) > 0 ? $cloudLayers_segmentStr.' , ' : 'Sky clear , ');
-$outputEnglishText .= 'temperature '.WrapNumber(+$temp_celcius)." , dew point ".WrapNumber(+$temp_dewpoint)." , ";
-$outputEnglishText .= 'altimeter '.$altimeter_hg.". ";
+$outputEnglishText .= 'temperature '.$temp_celcius." , dew point ".$temp_dewpoint." , ";
+$outputEnglishText .= 'temperature '.WrapNumberSpell($temp_celcius)." , dew point ".WrapNumberSpell($temp_dewpoint)." , ";
+$outputEnglishText .= 'altimeter '.WrapNumberSpell($altimeter_hg).". ";
 $outputEnglishText .= 'IFR approach '.GetAirportAppRwysString($app_rwys, $app_type, 'en')." , ";
 $outputEnglishText .= 'departures '.GetAirportDepRwysString($dep_rwys, 'en').". ";
 foreach($thisArptNotams as $notam)
@@ -308,7 +307,7 @@ $outputEnglishText .= 'Advise ATC that you have information '.WrapLetter($infoLe
 
 $outputFrenchText = ''.GetAirportNameString($airportICAO, 'fr').' information '.$infoLetter.'[,] ';
 $outputFrenchText .= 'météo à '.$infoZuluTime.', ';
-$outputFrenchText .= 'vent '.$windDirection.' à '.WrapNumber($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales à '.WrapNumber($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? ' variant entre '.$windVariatonList[0].' et '.$windVariatonList[1] : '').', ';
+$outputFrenchText .= 'vent '.$windDirection.' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales à '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? ' variant entre '.$windVariatonList[0].' et '.$windVariatonList[1] : '').', ';
 $outputFrenchText .= 'visibilité '.$visibility.', ';
 $outputFrenchText .= (strlen($precipitations_segmentStr) > 0 ? $precipitations_segmentStr.', ' : '');
 $outputFrenchText .= (strlen($cloudLayers_segmentStr) > 0 ? $cloudLayers_segmentStr.', ' : 'Sky clear, ');
@@ -341,6 +340,12 @@ $outputEnglishText .= $metarMatches['clouds'][0].', ';
 function getUni($str){
      return json_decode('{"t":"'.$str.'"}')->t;
 }
+
+
+$outputEnglishText = preg_replace ( '/(?<=[0-9]{2}[R|L|C]|[0-9]{2})\/(?=[0-9]{2}[R|L|C|]|[0-9]{2})/' , "-" , $outputEnglishText);
+$outputEnglishText = preg_replace ( '/([0-9]+)FT/' , "*$1FEET" , $outputEnglishText);
+
+
 echo $outputEnglishText;
 
 
