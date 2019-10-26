@@ -7,6 +7,16 @@ function WrapNumber($infoNumber)
 {
 	return '*'.$infoNumber;
 };
+function WrapNumberForBetaTempPKM($infoNumber)
+{
+    $return_str = '';
+    $length = strlen($infoNumber);
+    $thisWordCodeVerdeeld = array();
+    for ($i=0; $i<$length; $i++) {
+        $return_str .= (($i>0)?'*':'').$infoNumber[$i];
+    }
+	return '*'.$infoNumber;
+};
 function GetPrecipitationDescriptionStrings($precipitation_descr)
 {
 	$precipitation_descr_strings = null;

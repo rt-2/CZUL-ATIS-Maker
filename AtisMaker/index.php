@@ -288,6 +288,7 @@ if(DEBUG)
 	echo '== FINAL ATIS ==';
 	echo "\n\n";
 }
+$infoZuluTime = WrapNumberForBetaTempPKM($infoZuluTime);
 $outputEnglishText = GetAirportNameString($airportICAO, 'en').' information '.WrapLetter($infoLetter)." , ";
 $outputEnglishText .= 'weather at '.$infoZuluTime.". ";
 $outputEnglishText .= 'wind '.$windDirection.' at '.WrapNumber($windSpeed_kts).($windSpeed_gust > 0 ? ' , gusting '.WrapNumber($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " , varying between ".$windVariatonList[0].' and '.$windVariatonList[1] : '').". ";
