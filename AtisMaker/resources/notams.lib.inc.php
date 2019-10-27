@@ -20,6 +20,7 @@ $GLOBALS['notams_array'] = [
 	],
 	"CYHU" => [
 		[
+			"en" => "T",
 			"en" => "TWY B BTN ENA AND 240 FT FM ENA CLSD",
 			//"fr" => "",
 		],
