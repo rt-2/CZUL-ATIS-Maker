@@ -1,14 +1,14 @@
 <?php
-//header('Content-Type: text/plain; charset=ascii');
-//header('Content-Type: text/plain; charset=utf-8');
-//header('Content-Type: text/plain; charset=ansi');
+// Euroscope Compatibility
 header('Content-Type: text/plain; charset=ISO-8859-1');
-
-include_once('./resources/airports.lib.inc.php');
-include_once('./resources/notams.lib.inc.php');
 
 require_once('./includes/class.metarPart.inc.php');
 require_once('./includes/functions.inc.php');
+
+include_once('./resources/metars.lib.inc.php');
+include_once('./resources/airports.lib.inc.php');
+include_once('./resources/notams.lib.inc.php');
+
 
 
 ?>
@@ -17,24 +17,10 @@ require_once('./includes/functions.inc.php');
 define('DEBUG', false);
 
 
-global $cityNames_array, $notams_array;
-//define('NOTAMS_LIST', $notams_array);
-//define('CITY_NAMES_BY_ICAO', $cityNames_array);
-
-
 $metarMatches = [];
 $metar = $_GET['metar'];
 $metarMainParts = [];
 $metarMainPartStrings = [];
-
-(new MetarMainPart())->SetNew('local', '(?<=^)\w{4}\s\d{2}\d{4}Z(?=\s)');
-(new MetarMainPart())->SetNew('winds', '(?<=\s)(?>VRB|\d{3})\d{2}(?:G\d{2})?KT(?:\s\d{3}V\d{3})?(?=\s)');
-(new MetarMainPart())->SetNew('visibility', '(?<=\s)(?:\d{1,2}|\d\/\d)SM(?=\s)');
-(new MetarMainPart())->SetNew('precipitations', '(?<=\s)(?:(?:\-|\+)?(?:[A-Z]{2}){1,3}(?=\s)){0,}(?=\s)', false);
-(new MetarMainPart())->SetNew('clouds', '(?<=\s)SKC|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,}(?=\s)');
-(new MetarMainPart())->SetNew('temps', '(?<=\s)M?\d\d\/M?\d\d(?=\s)');
-(new MetarMainPart())->SetNew('altimeter', '(?<=\s)A\d{4}(?=\s)');
-(new MetarMainPart())->SetNew('remarks', '(?<=\s)RMK [[:ascii:]]*');
 
 $metar_regex = '';
 foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
@@ -62,12 +48,11 @@ if(DEBUG)
 	echo $metar_regex;
 	echo "\n\n";
 }
-	preg_match_all('/'.$metar_regex.'/', $metar, $matches);
 
+preg_match_all('/'.$metar_regex.'/', $metar, $matches);
 foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 {
 	$metarMainPart_obj->SetResultString($matches[$name][0]);
-	
 }
 
 
@@ -231,6 +216,7 @@ if(strtoupper($windDirection) !== 'VRB')
 	    $windDirection = '0'.$windDirection;
     }
 }
+//Fetch NOTAMs
 $thisArptNotams = [];
 if(in_array($airportICAO, array_keys($GLOBALS['notams_array'])))
 {
@@ -242,13 +228,13 @@ if(DEBUG)
 	echo '== FINAL ATIS ==';
 	echo "\n\n";
 }
+//Build String
 $outputEnglishText = GetAirportNameString($airportICAO, 'en').' information '.WrapLetter($infoLetter)." , ";
 $outputEnglishText .= 'weather at '.WrapNumberSpell($infoZuluTime)."*Z. ";
 $outputEnglishText .= 'wind '.WrapNumberSpell($windDirection).' at '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' , gusting '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " , varying between ".$windVariatonList[0].' and '.$windVariatonList[1] : '').". ";
 $outputEnglishText .= 'visibility '.WrapNumberSpell($visibility);
 $outputEnglishText .= (strlen($precipitations_segmentStr) > 0 ? " , ".$precipitations_segmentStr.'. ' : ". ");
 $outputEnglishText .= (strlen($cloudLayers_segmentStr) > 0 ? $cloudLayers_segmentStr.' , ' : 'Sky clear , ');
-$outputEnglishText .= 'temperature '.$temp_celcius." , dew point ".$temp_dewpoint." , ";
 $outputEnglishText .= 'temperature '.WrapNumberSpell($temp_celcius)." , dew point ".WrapNumberSpell($temp_dewpoint)." , ";
 $outputEnglishText .= 'altimeter '.WrapNumberSpell($altimeter_hg).". ";
 $outputEnglishText .= 'IFR approach '.GetAirportAppRwysString($app_rwys, $app_type, 'en')." , ";
@@ -262,7 +248,7 @@ $outputEnglishText .= 'Advise ATC that you have information '.WrapLetter($infoLe
 $outputFrenchText = ''.GetAirportNameString($airportICAO, 'fr').' information '.$infoLetter.'[,] ';
 $outputFrenchText .= 'météo à  '.$infoZuluTime.', ';
 $outputFrenchText .= 'vent '.$windDirection.' à  '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales à  '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? ' variant entre '.$windVariatonList[0].' et '.$windVariatonList[1] : '').', ';
-$outputFrenchText .= 'visibilitÃ© '.$visibility.', ';
+$outputFrenchText .= 'visibilité '.$visibility.', ';
 $outputFrenchText .= (strlen($precipitations_segmentStr) > 0 ? $precipitations_segmentStr.', ' : '');
 $outputFrenchText .= (strlen($cloudLayers_segmentStr) > 0 ? $cloudLayers_segmentStr.', ' : 'Sky clear, ');
 
@@ -291,9 +277,7 @@ $outputEnglishText .= $metarMatches['clouds'][0].', ';
 //$outputEnglishText = str_replace(["\r\n","\n","\r"], "", $outputText);
 //$outputEnglishText = str_replace(['CYUL','CYOW'], ['Montreal','Ottawa'], $outputText);
 */
-function getUni($str){
-     return json_decode('{"t":"'.$str.'"}')->t;
-}
+
 
 
 $outputEnglishText = preg_replace ( '/(?<=[0-9]{2}[R|L|C]|[0-9]{2})\/(?=[0-9]{2}[R|L|C|]|[0-9]{2})/' , "-" , $outputEnglishText);
@@ -301,11 +285,6 @@ $outputEnglishText = preg_replace ( '/([0-9]+)FT/' , "*$1FEET" , $outputEnglishT
 
 
 echo $outputEnglishText;
-
-
-//echo getUni("\u000A").getUni("\u000B").getUni("\u000C").getUni("\u000D").getUni("\u0085").getUni("\u2028").getUni("\u2029");
-//echo getUni("\u00ed").getUni("\u000A").getUni("\u000B").getUni("\u000C").getUni("\u000D").getUni("\u0085").getUni("\u2028").getUni("\u2029");
-//echo getUni("\u000A").getUni("\u000B").getUni("\u000C").getUni("\u000D").getUni("\u0085").getUni("\u2028").getUni("\u2029");
 
 //echo "\t\r\t";
 //echo $outputFrenchText;
