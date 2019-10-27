@@ -2,11 +2,11 @@
 $GLOBALS['cityNames_array'] = [
 	'CYUL' => [
 		'en' => 'Montreal International Airport',
-		'fr' => 'Aéroport International de MontrÃ©al',
+		'fr' => 'Aéroport International de Montréal',
 	],
 	'CYQB' => [
-		'en' => 'QuÃ©bec International Airport',
-		'fr' => 'Aéroport International de QuÃ©bec',
+		'en' => 'Québec International Airport',
+		'fr' => 'Aéroport International de Québec',
 	],
 	'CYOW' => [
 		'en' => 'Ottawa International Airport',
