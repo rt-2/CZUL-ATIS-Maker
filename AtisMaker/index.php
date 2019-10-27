@@ -4,6 +4,8 @@
 //header('Content-Type: text/plain; charset=ansi');
 header('Content-Type: text/plain; charset=ISO-8859-1');
 
+include_once('./resources/airports.lib.inc.php');
+
 require_once('./includes/class.metarPart.inc.php');
 require_once('./includes/functions.inc.php');
 
@@ -13,53 +15,40 @@ require_once('./includes/functions.inc.php');
 
 define('DEBUG', false);
 
-$GLOBALS['cityNames_array'] = [
-	'CYUL' => [
-		'en' => 'Montreal International Airport',
-		'fr' => 'Aéroport International de Montréal',
-	],
-	'CYQB' => [
-		'en' => 'Québec International Airport',
-		'fr' => 'Aéroport International de Québec',
-	],
-	'CYOW' => [
-		'en' => 'Ottawa International Airport',
-		'fr' => 'Aéroport International d\'Ottawa',
-	],
-];
+
 $GLOBALS['notams_array'] = [
 	'CYUL' => [
 		191072 => [
 			'en' => 'TWY E BTN RWY 06L/24R AND TWY B CLSD',
-			//'fr' => 'Taxiway '. WrapLetter('E') .' fermé entre la piste 06G/24D et le taxiway '. WrapLetter('B'),
+			//'fr' => 'Taxiway '. WrapLetter('E') .' fermÃ© entre la piste 06G/24D et le taxiway '. WrapLetter('B'),
 		],
 		191510 => [
 			"en" => 'FIRST 2948FT RWY 06L CLSD',
-			//"fr" => "Premier ".WrapNumberWhole("2948")."ft de la piste 06G fermé",
+			//"fr" => "Premier ".WrapNumberWhole("2948")."ft de la piste 06G fermÃ©",
 		],
 		191538 => [
 			"en" => "RWY 10/28 CLSD AVBL AS TWY",
-			//"fr" => "Piste 10/28 fermé, disponble comme taxiway",
+			//"fr" => "Piste 10/28 fermÃ©, disponble comme taxiway",
 		],
 		[
 			"en" => "TWY G CLSD",
-			//"fr" => "Piste 10/28 fermé, disponble comme taxiway",
+			//"fr" => "Piste 10/28 fermÃ©, disponble comme taxiway",
 		],
 	],
 	"CYHU" => [
 		190430 => [
 			"en" => "Runway 10/28 closed, available as taxiway",
-			//"fr" => "Piste 10/28 fermé, disponble comme taxiway",
+			//"fr" => "Piste 10/28 fermÃ©, disponble comme taxiway",
 		],
 	],
 	"CYMX" => [
 		190459 => [
 			"en" => "Runway 11/29 closed between sunset and sunrise",
-			//"fr" => "Piste 11/29 fermé entre le crépuscule et soir et le crépuscule du matin",
+			//"fr" => "Piste 11/29 fermÃ© entre le crÃ©puscule et soir et le crÃ©puscule du matin",
 		],
 		190465 => [
 			"en" => "Taxiway ".WrapLetter("A")." closed between taxiway ".WrapLetter("H")." and holding bay 11",
-			//"fr" => "Taxiway ".WrapLetter("A")." fermé entre le taxiway ".WrapLetter("H")." et l\'air d\'attente piste 11",
+			//"fr" => "Taxiway ".WrapLetter("A")." fermÃ© entre le taxiway ".WrapLetter("H")." et l\'air d\'attente piste 11",
 		],
 	],
 ];
@@ -306,9 +295,9 @@ foreach($thisArptNotams as $notam)
 $outputEnglishText .= 'Advise ATC that you have information '.WrapLetter($infoLetter).'.';
 
 $outputFrenchText = ''.GetAirportNameString($airportICAO, 'fr').' information '.$infoLetter.'[,] ';
-$outputFrenchText .= 'météo à '.$infoZuluTime.', ';
-$outputFrenchText .= 'vent '.$windDirection.' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales à '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? ' variant entre '.$windVariatonList[0].' et '.$windVariatonList[1] : '').', ';
-$outputFrenchText .= 'visibilité '.$visibility.', ';
+$outputFrenchText .= 'météo à  '.$infoZuluTime.', ';
+$outputFrenchText .= 'vent '.$windDirection.' à  '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales à  '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? ' variant entre '.$windVariatonList[0].' et '.$windVariatonList[1] : '').', ';
+$outputFrenchText .= 'visibilitÃ© '.$visibility.', ';
 $outputFrenchText .= (strlen($precipitations_segmentStr) > 0 ? $precipitations_segmentStr.', ' : '');
 $outputFrenchText .= (strlen($cloudLayers_segmentStr) > 0 ? $cloudLayers_segmentStr.', ' : 'Sky clear, ');
 
