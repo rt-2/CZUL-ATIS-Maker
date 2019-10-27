@@ -28,7 +28,11 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 	
 	$metar_regex .= $metarMainPart_obj->regex.'\s?';
 }
+$metar_regex = '/'.$metar_regex.'/mu';
+
+
 /*
+echo $metar_regex;
 
 $main_local_regex.'\s?'.$main_wind_regex.'\s?'.$main_visibility_regex.'\s?'.$main_precipitation_regex.'\s?'.$main_cloud_regex.'\s?'.$main_temp_regex.'\s?'.$main_altimeter_regex.'\s?RMK\s'.$main_remark_regex;
 $winds_regex = '/(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z\s(?P<winds>\d{5}(?:G\d{2})?KT)\s(?P<visibility>\d{1,2})SM\s(?P<precipitations>(?:(?:(?:\-|\+)?[A-Z]{2})\s){0,})(?P<clouds>(?:(?:FEW|BKN|SCT|OVC)\d{3}\s){0,})(?P<temperature>\d{2})\/(?P<dewPoint>\d{2})\sA(?P<altimeter>\d{4}) RMK (?P<remarks>[[:ascii:]]*)';
@@ -49,7 +53,7 @@ if(DEBUG)
 	echo "\n\n";
 }
 
-preg_match_all('/'.$metar_regex.'/', $metar, $matches);
+preg_match_all($metar_regex, $metar, $matches);
 foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 {
 	$metarMainPart_obj->SetResultString($matches[$name][0]);
@@ -58,8 +62,8 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 
 
 
-MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','issue_date','issue_time'], '^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$');
-MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '^(?P<wind_degree>\w{3})(?P<wind_speed>\w{2}(?:G\w{2})?KT)(?:\s(?P<wind_variaton>\d{3}V\d{3}))?$');
+MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','issue_date','issue_time'], '/^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$/');
+MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '/^(?P<wind_degree>\w{3})(?P<wind_speed>\w{2}(?:G\w{2})?KT)(?:\s(?P<wind_variaton>\d{3}V\d{3}))?$/');
 
 
 
@@ -67,7 +71,7 @@ if(DEBUG)
 {
 	foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 	{
-		echo "\n\n";
+		//echo "\n\n";
 		echo $name.' : ';
 		echo '   ';
 		echo MetarMainPart::$allMetarMainPartsByNames[$name]->result_str;
@@ -96,6 +100,12 @@ function GetAirportNameString($icao, $lang)
 	}
 	return $return_value;
 }
+
+//var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str);
+
+//var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str);
+//var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str);
+
 $infoLetter = $_GET['info'];
 $infoZuluTime = str_replace('Z', '*Z', MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str);
 $windDirection = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str;
