@@ -153,7 +153,7 @@ foreach($precipitations_array as $precipitation)
 		$precipitation_descr = substr($precipitation_name, 0, 2);
 		$precipitation_name = substr($precipitation_name, 2, 2);
 	}
-	$precipitation_descr_str = GetPrecipitationDescriptionStrings($precipitation_descr)['en'];
+	$precipitation_descr_str = METAR_PRECIP_DESCR_NAMES[$precipitation_descr]['en'];
 	$precipitation_name_str = GetPrecipitationNameStrings($precipitation_name)['en'];
 	if(strlen($precipitation_name_str) > 0)
 	{

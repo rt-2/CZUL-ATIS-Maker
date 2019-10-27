@@ -16,9 +16,11 @@ function WrapNumberSpell($infoNumber)
     $num_negative = ($num_for_int_tests < 0)? true : false;
     if((string)+$num_for_str_tests === (string)$num_for_str_tests)
     {
+        $sep = "\t"; $sign = '*';
         $length = strlen($num_for_str_results);
+        $return_str .= $sep;
         for ($i=0; $i < $length; $i++) {
-            $return_str .= "\t*".+$num_for_str_results[$i];
+            $return_str .= $sign.+$num_for_str_results[$i].$sep;
         }
         if($num_negative)
         {
@@ -34,7 +36,9 @@ function WrapNumberSpell($infoNumber)
 };
 function GetPrecipitationDescriptionStrings($precipitation_descr)
 {
-	$precipitation_descr_strings = null; 
+	$precipitation_descr_strings = null;
+
+
 	switch($precipitation_descr)
 	{
 		case 'BC':
