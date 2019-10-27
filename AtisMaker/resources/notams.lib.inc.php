@@ -19,6 +19,10 @@ $GLOBALS['notams_array'] = [
 		]
 	],
 	"CYHU" => [
+		[
+			"en" => "TWY B BTN ENA AND 240 FT FM ENA CLSD",
+			//"fr" => "",
+		],
 		190430 => [
 			"en" => "Runway 10/28 closed, available as taxiway",
 			//"fr" => "Piste 10/28 fermé, disponble comme taxiway",

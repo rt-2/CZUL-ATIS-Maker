@@ -14,111 +14,68 @@
 const METAR_PRECIP_DESCR_NAMES =
 [
     'BC' => [ 'en' => 'patches',
-                'fr' => '', ]
+                'fr' => '', ],
     'BL' => [ 'en' => 'blowing',
-		        'fr' => '', ]
+		        'fr' => '', ],
     'DR' => [ 'en' => 'low drifting',
-		        'fr' => '', ]
-    'FZ' => [ 'en' => 		'freezing',
-		        'fr' => '', ]
+		        'fr' => '', ],
+    'FZ' => [ 'en' => 'freezing',
+		        'fr' => '', ],
     'MI' => [ 'en' => 'shallow',
-		        'fr' => '', ]
+		        'fr' => '', ],
     'PR' => [ 'en' => 'partial',
-		        'fr' => '', ]
+		        'fr' => '', ],
     'SH' => [ 'en' => 'shower',
-		        'fr' => '', ]
+		        'fr' => '', ],
     'TS' => [ 'en' => 'thunderstorm',
-		        'fr' => '', ]
-]
+		        'fr' => '', ],
+];
 
 const METAR_PRECIP_NAMES =
 [
-		case 'DZ': = ['en' => 'drizzle',
-				'fr' => '',
-			];
-			break;
-		case 'GR': = ['en' => 'hail',
-				'fr' => '',
-			];
-			break;
-		case 'GS': = ['en' => 'snow pellets',
-				'fr' => '',
-			];
-			break;
-		case 'IC': = ['en' => 'ice crystals',
-				'fr' => '',
-			];
-			break;
-		case 'PL': = ['en' => 'ice pellets',
-				'fr' => '',
-			];
-			break;
-		case 'RA': = ['en' => 'rain',
-				'fr' => '',
-			];
-			break;
-		case 'SG': = ['en' => 'snow Grains',
-				'fr' => '',
-			];
-			break;
-		case 'SN': = ['en' => 'snow',
-				'fr' => '',
-			];
-			break;
-		case 'UP': = ['en' => 'unknown precipitation',
-				'fr' => '',
-			];
-			break;
-		case 'BR': = ['en' => 'mist',
-				'fr' => '',
-			];
-			break;
-		case 'DU': = ['en' => 'widespread dust',
-				'fr' => '',
-			];
-			break;
-		case 'FG': = ['en' => 'fog',
-				'fr' => '',
-			];
-			break;
-		case 'FU': = ['en' => 'smoke',
-				'fr' => '',
-			];
-			break;
-		case 'HZ': = ['en' => 'haze',
-				'fr' => '',
-			];
-			break;
-		case 'PY': = ['en' => 'spray',
-				'fr' => '',
-			];
-			break;
-		case 'SA': = ['en' => 'sand',
-				'fr' => '',
-			];
-			break;
-		case 'VA': = ['en' => 'volcanic ash',
-				'fr' => '',
-			];
-			break;
-		case 'DS': = ['en' => 'dust storm',
-				'fr' => '',
-			];
-			break;
-		case 'FC': = ['en' => 'funnel cloud',
-				'fr' => '',
-			];
-			break;
-		case 'PO': = ['en' => 'well-developed',
-				'fr' => '',
-			];
-			break;
-		case 'SQ': = ['en' => 'squalls',
-				'fr' => '',
-			];
-			break;
-		case 'SS': = ['en' => 'sandstorm',
-				'fr' => '',
-			];
-]
+	'DZ' => [  'en' => 'drizzle',
+				'fr' => '', ],
+	'GR' => [  'en' => 'hail',
+				'fr' => '', ],
+	'GS' => [  'en' => 'snow pellets',
+				'fr' => '', ],
+	'IC' => [  'en' => 'ice crystals',
+				'fr' => '', ],
+	'PL' => [  'en' => 'ice pellets',
+				'fr' => '', ],
+	'RA' => [  'en' => 'rain',
+				'fr' => '', ],
+	'SG' => [  'en' => 'snow Grains',
+				'fr' => '', ],
+	'SN' => [  'en' => 'snow',
+				'fr' => '', ],
+	'UP' => [  'en' => 'unknown precipitation',
+				'fr' => '', ],
+	'BR' => [  'en' => 'mist',
+				'fr' => '', ],
+	'DU' => [  'en' => 'widespread dust',
+				'fr' => '', ],
+	'FG' => [  'en' => 'fog',
+				'fr' => '', ],
+	'FU' => [  'en' => 'smoke',
+				'fr' => '', ],
+	'HZ' => [  'en' => 'haze',
+				'fr' => '', ],
+	'PY' => [  'en' => 'spray',
+				'fr' => '', ],
+	'SA' => [  'en' => 'sand',
+				'fr' => '', ],
+	'VA' => [  'en' => 'volcanic ash',
+				'fr' => '', ],
+	'DS' => [  'en' => 'dust storm',
+				'fr' => '', ],
+	'FC' => [  'en' => 'funnel cloud',
+				'fr' => '', ],
+	'PO' => [  'en' => 'well-developed',
+				'fr' => '', ],
+	'SQ' => [  'en' => 'squalls',
+				'fr' => '', ],
+	'SS' => [  'en' => 'sandstorm',
+			    'fr' => '', ],
+];
 ?>
