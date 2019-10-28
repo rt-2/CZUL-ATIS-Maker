@@ -3,15 +3,15 @@
 
 $GLOBALS['notams_array'] = [
 	'CYUL' => [
-		191072 => [
-			'en' => 'TWY E BTN RWY 06L/24R AND TWY B CLSD',
-			'fr' => 'Taxiway E fermé entre la piste 06G/24D et le taxiway B',
+		[
+			'en' => 'RWY 06L/24R CLSD',
+			'fr' => 'Piste 06G/24D fermé',
+        ],
+		[
+			'en' => 'TWY E BTN TWY I AND RWY 10/28 CLSD',
+			'fr' => 'Taxiway E fermé entre le taxiway B et la piste 06G/24D',
 		],
-		191510 => [
-			"en" => 'FIRST 2948FT RWY 06L CLSD',
-			"fr" => "Premier 2948ft de la piste 06G fermé",
-		],
-		191538 => [
+		[
 			"en" => "RWY 10/28 CLSD AVBL AS TWY",
 			"fr" => "Piste 10/28 fermé, disponble comme taxiway",
 		],
@@ -44,7 +44,40 @@ $GLOBALS['notams_array'] = [
 
 
 
-New NotamTextAdjustments('A' , 'ALPHA');New NotamTextAdjustments('B' , 'BRAVO');New NotamTextAdjustments('C' , 'CHARLIE');New NotamTextAdjustments('D' , 'DELTA');New NotamTextAdjustments('E' , 'ECHO');New NotamTextAdjustments('F' , 'FOXTROT');New NotamTextAdjustments('G' , 'GOLF');New NotamTextAdjustments('H' , 'HOTEL');New NotamTextAdjustments('I' , 'INDIA');New NotamTextAdjustments('J' , 'JULIET');New NotamTextAdjustments('K' , 'KILO');New NotamTextAdjustments('L' , 'LEEMA');New NotamTextAdjustments('M' , 'MICK');New NotamTextAdjustments('N' , 'NOVEMBER');New NotamTextAdjustments('O' , 'OSCAR');New NotamTextAdjustments('P' , 'PAPA');New NotamTextAdjustments('Q' , 'QUEBEC');New NotamTextAdjustments('R' , 'ROMEO');New NotamTextAdjustments('S' , 'SIERRA');New NotamTextAdjustments('T' , 'TANGO');New NotamTextAdjustments('U' , 'UNIFORM');New NotamTextAdjustments('V' , 'VICTOR');New NotamTextAdjustments('W' , 'WHISKEY');New NotamTextAdjustments('X' , 'X-RAY');New NotamTextAdjustments('Y' , 'YANKEE');New NotamTextAdjustments('Z' , 'ZULU');    New NotamTextAdjustments('TWY', 'TAXIWAY');New NotamTextAdjustments('FM', 'FROM');New NotamTextAdjustments('RWY', 'RUNWAY');New NotamTextAdjustments('BTN', 'BETWEEN');New NotamTextAdjustments('AVBL', 'AVAILABLE');New NotamTextAdjustments('CLSD', 'CLOSED');
+
+New NotamTextAdjustments('A' , 'ALPHA');
+New NotamTextAdjustments('B' , 'BRAVO');
+New NotamTextAdjustments('C' , 'CHARLIE');
+New NotamTextAdjustments('D' , 'DELTA');
+New NotamTextAdjustments('E' , 'ECHO');
+New NotamTextAdjustments('F' , 'FOXTROT');
+New NotamTextAdjustments('G' , 'GOLF');
+New NotamTextAdjustments('H' , 'HOTEL');
+New NotamTextAdjustments('I' , 'INDIA');
+New NotamTextAdjustments('J' , 'JULIET');
+New NotamTextAdjustments('K' , 'KILO');
+New NotamTextAdjustments('L' , 'LEEMA');
+New NotamTextAdjustments('M' , 'MICK');
+New NotamTextAdjustments('N' , 'NOVEMBER');
+New NotamTextAdjustments('O' , 'OSCAR');
+New NotamTextAdjustments('P' , 'PAPA');
+New NotamTextAdjustments('Q' , 'QUEBEC');
+New NotamTextAdjustments('R' , 'ROMEO');
+New NotamTextAdjustments('S' , 'SIERRA');
+New NotamTextAdjustments('T' , 'TANGO');
+New NotamTextAdjustments('U' , 'UNIFORM');
+New NotamTextAdjustments('V' , 'VICTOR');
+New NotamTextAdjustments('W' , 'WHISKEY');
+New NotamTextAdjustments('X' , 'X-RAY');
+New NotamTextAdjustments('Y' , 'YANKEE');
+New NotamTextAdjustments('Z' , 'ZULU');
+    
+New NotamTextAdjustments('TWY', 'TAXIWAY');
+New NotamTextAdjustments('FM', 'FROM');
+New NotamTextAdjustments('RWY', 'RUNWAY');
+New NotamTextAdjustments('BTN', 'BETWEEN');
+New NotamTextAdjustments('AVBL', 'AVAILABLE');
+New NotamTextAdjustments('CLSD', 'CLOSED');
 
 
 

@@ -1,6 +1,7 @@
 <?php
 // Euroscope Compatibility
-header('Content-Type: text/plain; charset=ISO-8859-1');
+header('Content-Type: text/plain; charset=WINDOWS-1252');
+//header('Content-Type: text/plain; charset=ISO-8859-1');
 //header('Content-Type: text/plain; charset=UTF-8');
 
 require_once('./includes/atis.class.inc.php');
@@ -307,9 +308,12 @@ if($notamsDemanded)
     
         $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
 
-        $this_notam_text = preg_replace ( '/(?<=\W)(\d{2}[R|L|C]?)\/(\d{2}[R|L|C]?)(?=\W)/' , "$1 $2" , $this_notam_text);
-        $this_notam_text = preg_replace ( '/([0-9]+)ft/' , "$1 feet" , $this_notam_text);
+        //var_dump($this_notam_text);
 
+        $this_notam_text = preg_replace ( '/(?<=\W|^)(\d{2}[D|G|C]?)\/(\d{2}[D|G|C]?)(?=\W|$)/' , "$1&$2" , $this_notam_text);
+        $this_notam_text = preg_replace ( '/([0-9]+)ft/' , "$1 feet" , $this_notam_text);
+        
+        //var_dump($this_notam_text);
         $this_notam_text = strtolower($this_notam_text);
     
 	    $notams->addSection( $this_notam_text );
@@ -369,8 +373,7 @@ if($notamsDemanded)
     
         //var_dump($this_notam_text);
         $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
-
-        $this_notam_text = preg_replace ( '/(?<=\W)(\d{2}[R|L|C]?)\/(\d{2}[R|L|C]?)(?=\W)/' , "$1 $2" , $this_notam_text);
+        $this_notam_text = preg_replace ( '/(?<=\W|^)(\d{2}[R|L|C]?)\/(\d{2}[R|L|C]?)(?=\W|$)/' , "$1&$2" , $this_notam_text);
         $this_notam_text = preg_replace ( '/([0-9]+)ft/' , "$1 feet" , $this_notam_text);
 
         //var_dump($this_notam_text);
@@ -423,10 +426,9 @@ $outputEnglishText .= $metarMatches['clouds'][0].', ';
 
 //var_dump($atsResult);
 
+echo "\r\t\t".'(('."\r".$atsResultFr->returnResult()."\t\t".'))'."\r\r";
 
-echo "\t\t".'(('."\r".$atsResultFr->returnResult()."\t\t".'))'."\r";
 echo $atsResultEn->returnResult();
-
 //$outputEnglishText = NotamTextAdjustments::AdjustAndReturnText($outputEnglishText);
 
 
