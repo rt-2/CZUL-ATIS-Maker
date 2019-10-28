@@ -11,6 +11,7 @@ require_once('./includes/functions.inc.php');
 
 include_once('./resources/metars.lib.inc.php');
 include_once('./resources/airports.lib.inc.php');
+include_once('./resources/fir.data.inc.php');
 include_once('./resources/notams.lib.inc.php');
 
 
@@ -65,38 +66,49 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 
 
 $notamsDemanded = isset($_GET['notams']);
-
+$bilingualDemanded = isset($_GET['qc']);
 
 
 MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','issue_date','issue_time'], '/^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$/');
 MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '/^(?P<wind_degree>\w{3})(?P<wind_speed>\w{2}(?:G\w{2})?KT)(?:\s(?P<wind_variaton>\d{3}V\d{3}))?$/');
 
+$airportICAO = MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['airport_icao']->result_str;
 
+$atisAvailable = in_array($airportICAO, $atisEnabledAirports);
 
-if(DEBUG)
+if(!$atisAvailable)
 {
-	foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
-	{
-		//echo "\n\n";
-		echo $name.' : ';
-		echo '   ';
-		echo MetarMainPart::$allMetarMainPartsByNames[$name]->result_str;
-		echo "\n";
-		foreach($metarMainPart_obj->subPartsByNames as $name => $metarPart_obj)
-		{
-			echo '   '.$name.' : ';
-			echo $metarPart_obj->result_str;
-			echo "\n";
-			
-		}
-		
-	}
+    
+    echo $metar;
+    exit();
 }
+
+
+//if(DEBUG)
+//{
+//    foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
+//    {
+//        //echo "\n\n";
+//        echo $name.' : ';
+//        echo '   ';
+//        echo MetarMainPart::$allMetarMainPartsByNames[$name]->result_str;
+//        echo "\n";
+//        foreach($metarMainPart_obj->subPartsByNames as $name => $metarPart_obj)
+//        {
+//            echo '   '.$name.' : ';
+//            echo $metarPart_obj->result_str;
+//            echo "\n";
+			
+//        }
+		
+//    }
+//}
 	//echo "\n\n";
 	//echo "\n\n";
 	//echo json_encode($matches);
 
-$airportICAO = MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['airport_icao']->result_str;
+
+
 function GetAirportNameString($icao, $lang)
 {
 	$return_value = '['.$icao.']';
@@ -127,13 +139,15 @@ $visibility = str_replace('SM', '', MetarMainPart::$allMetarMainPartsByNames['vi
 $precipitations = MetarMainPart::$allMetarMainPartsByNames['precipitations']->result_str;
 $precipitations_array = explode(" ", $precipitations);
 $precipitations_segmentArr = [];
-$precipitations_segmentStr = '';
+$precipitations_segmentStrFr = '';
+$precipitations_segmentStrEn = '';
 foreach($precipitations_array as $precipitation)
 {
 	$precipitation_intensity = '';
 	$precipitation_name = $precipitation;
 	$precipitation_descr = $precipitation;
-	$precipitation_intensity_str = '';
+	$precipitation_intensity_strFr = '';
+	$precipitation_intensity_strEn = '';
 	$precipitation_descr_str = '';
 	$precipitation_name_str = '';
 	if(substr($precipitation, 0, 1) === '-' || substr($precipitation, 0, 1) === '+')
@@ -145,60 +159,79 @@ foreach($precipitations_array as $precipitation)
 	switch($precipitation_intensity)
 	{
 		case '-':
-			$precipitation_intensity_str = 'light';
-			break;
-		case '':
-			$precipitation_intensity_str = 'moderate';
+			$precipitation_intensity_strFr = 'faible';
+			$precipitation_intensity_strEn = 'light';
 			break;
 		case '+':
-			$precipitation_intensity_str = 'heavy';
+			$precipitation_intensity_strFr = 'fort';
+			$precipitation_intensity_strEn = 'heavy';
 			break;
+        default:
+			//$precipitation_intensity_strFr = 'modéré';
+			//$precipitation_intensity_strEn = 'moderate';
+            break;
 	}
 	if(strlen($precipitation_name) === 4)
 	{
 		$precipitation_descr = substr($precipitation_name, 0, 2);
 		$precipitation_name = substr($precipitation_name, 2, 2);
 	}
-	$precipitation_descr_str = METAR_PRECIP_DESCR_NAMES[$precipitation_descr]['en'];
-	$precipitation_name_str = METAR_PRECIP_NAMES[$precipitation_name]['en'];
-	if(strlen($precipitation_name_str) > 0)
+	$precipitation_descr_strFr = METAR_PRECIP_DESCR_NAMES[$precipitation_descr]['fr'];
+	$precipitation_name_strFr = METAR_PRECIP_NAMES[$precipitation_name]['fr'];
+	$precipitation_descr_strEn = METAR_PRECIP_DESCR_NAMES[$precipitation_descr]['en'];
+	$precipitation_name_strEn = METAR_PRECIP_NAMES[$precipitation_name]['en'];
+	if(strlen($precipitation_name_strFr) > 0)
 	{
-		$precipitations_segmentArr[] = $precipitation_intensity_str.' '.(( strlen($precipitation_descr_str) > 0) ? $precipitation_descr_str.' ':'').$precipitation_name_str;
+		$precipitations_segmentArrFr[] = (( strlen($precipitation_intensity_strFr) > 0) ? $precipitation_intensity_strFr.' ':'').(( strlen($precipitation_descr_strFr) > 0) ? $precipitation_descr_strFr.' ':'').$precipitation_name_strFr;
+	}
+	if(strlen($precipitation_name_strEn) > 0)
+	{
+		$precipitations_segmentArrEn[] = (( strlen($precipitation_intensity_strEn) > 0) ? $precipitation_intensity_strEn.' ':'').(( strlen($precipitation_descr_strEn) > 0) ? $precipitation_descr_strEn.' ':'').$precipitation_name_strEn;
 	}
 }
 
-    $precipitations_segmentStr = implode(" , ", $precipitations_segmentArr);
+if(count($precipitations_segmentArrFr) > 0) $precipitations_segmentStrFr = implode(" , ", $precipitations_segmentArrFr);
+
+if(count($precipitations_segmentArrEn) > 0) $precipitations_segmentStrEn = implode(" , ", $precipitations_segmentArrEn);
 
 $clouds = MetarMainPart::$allMetarMainPartsByNames['clouds']->result_str;
 $clouds_array = explode(" ", $clouds);
 $cloudLayers_segmentArr = [];
-$cloudLayers_segmentStr = '';
+$cloudLayers_segmentFr = '';
+$cloudLayers_segmentEn = '';
 foreach($clouds_array as $cloudLayer)
 {
 	$type = substr($cloudLayer, 0, 3);
     //$unit = '(fr)';
     $unit = '';
 	$alt = WrapNumberWhole((+substr($cloudLayer, 3, 3)).'00').$unit;
-	$retStr = '';
-
+    
+	$retStrFr = '';
+	$retStrEn = '';
 	switch($type)
 	{
 		case 'FEW':
-			$retStr = 'few clouds at '.$alt;
+			$retStrFr = 'quelques nuages à '.$alt;
+			$retStrEn = 'few clouds at '.$alt;
 			break;
 		case 'SCT':
-			$retStr = 'scattered clouds at '.$alt;
+			$retStrFr = 'épars à '.$alt;
+			$retStrEn = 'scattered clouds at '.$alt;
 			break;
 		case 'BKN':
-			$retStr = $alt.' broken';
+			$retStrFr = 'fragmenté at '.$alt;
+			$retStrEn = $alt.' broken';
 			break;
 		case 'OVC':
-			$retStr = $alt.' overcast';
+			$retStrFr = 'couvert at '.$alt;
+			$retStrEn = $alt.' overcast';
 			break;
 	}
-	$cloudLayers_segmentArr[] = $retStr;
+	$cloudLayers_segmentArrFr[] = $retStrFr;
+	$cloudLayers_segmentArrEn[] = $retStrEn;
 }
-$cloudLayers_segmentStr = implode(" , ", $cloudLayers_segmentArr);
+$cloudLayers_segmentStrFr = implode(" , ", $cloudLayers_segmentArrFr);
+$cloudLayers_segmentStrEn = implode(" , ", $cloudLayers_segmentArrEn);
 $temps = MetarMainPart::$allMetarMainPartsByNames['temps']->result_str;
 $temps_array = explode("/", str_replace("M", "-", $temps));
 $temp_celcius = +preg_replace('((?=0)\d)', '$1', $temps_array[0]);
@@ -265,64 +298,67 @@ $atsResultFr = New AtisConstructor();
 
 //Build String
 
-$basicInformations = New AtisSectionConstructor();
-$basicInformations->addSection(  GetAirportNameString($airportICAO, 'fr').' information '.WrapLetter($infoLetter) );
-$basicInformations->addSection( 'météo à '.WrapNumberSpell($infoZuluTime).' Zulu' );
-$atsResultFr->addSection( $basicInformations->returnResult() );
-
-$windsEtc = New AtisSectionConstructor();
-$windsEtc->addSection( 'vent '. ( $windDirection === 'VRB' ? 'Variable' : WrapNumberSpell($windDirection) ).' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales Ã Â  '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " variant entre ".$windVariatonList[0].' et '.$windVariatonList[1] : '') );
-$windsEtc->addSection( 'visibilité '.WrapNumberSpell($visibility) );
-$atsResultFr->addSection( $windsEtc->returnResult() );
-
-$precip = New AtisSectionConstructor();
-$precip->addSection( $precipitations_segmentStr );
-$atsResultFr->addSection( $precip->returnResult() );
-
-$clouds = New AtisSectionConstructor();
-if (strlen($cloudLayers_segmentStr) > 0 ){
-    $clouds->addSection( $cloudLayers_segmentStr );
-} else {
-    $clouds->addSection( 'Sky clear');
-}
-$atsResultFr->addSection( $clouds->returnResult() );
-
-$baroEtc = New AtisSectionConstructor();
-$baroEtc->addSection( 'température '.WrapNumberSpell($temp_celcius) );
-$baroEtc->addSection( 'point de rosée '.WrapNumberSpell($temp_dewpoint) );
-$baroEtc->addSection( 'altimètre '.WrapNumberSpell($altimeter_hg) );
-$atsResultFr->addSection( $baroEtc->returnResult() );
-
-$procedures = New AtisSectionConstructor();
-$procedures->addSection( 'approches IFR '.GetAirportAppRwysString($app_rwys, $app_type, 'fr') );
-$procedures->addSection( 'departs '.GetAirportDepRwysString($dep_rwys, 'fr') );
-$atsResultFr->addSection( $procedures->returnResult() );
-
-if($notamsDemanded)
+if($bilingualDemanded)
 {
-    $notams = New AtisSectionConstructor();
-    foreach($thisArptNotams as $notam)
-    {
-        $this_notam_text =  $notam['fr'];
-    
-        $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
 
-        //var_dump($this_notam_text);
+    $basicInformations = New AtisSectionConstructor();
+    $basicInformations->addSection(  GetAirportNameString($airportICAO, 'fr').' renseignement '.WrapLetter($infoLetter) );
+    $basicInformations->addSection( 'météo à '.WrapNumberSpell($infoZuluTime).' Zulu' );
+    $atsResultFr->addSection( $basicInformations->returnResult() );
 
-        //var_dump($this_notam_text);
-        $this_notam_text = strtolower($this_notam_text);
-    
-	    $notams->addSection( $this_notam_text );
+    $windsEtc = New AtisSectionConstructor();
+    $windsEtc->addSection( 'vent '. ( $windDirection === 'VRB' ? 'Variable' : WrapNumberSpell($windDirection) ).' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales Ã Â  '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " variant entre ".$windVariatonList[0].' et '.$windVariatonList[1] : '') );
+    $windsEtc->addSection( 'visibilité '.WrapNumberSpell($visibility) );
+    $atsResultFr->addSection( $windsEtc->returnResult() );
+
+    $precip = New AtisSectionConstructor();
+    $precip->addSection( $precipitations_segmentStrFr );
+    $atsResultFr->addSection( $precip->returnResult() );
+
+    $clouds = New AtisSectionConstructor();
+    if (strlen($cloudLayers_segmentStrFr) > 0 ){
+        $clouds->addSection( $cloudLayers_segmentStrFr );
+    } else {
+        $clouds->addSection( 'aucun nuage');
     }
-    $atsResultFr->addSection( $notams->returnResult() );
+    $atsResultFr->addSection( $clouds->returnResult() );
+
+    $baroEtc = New AtisSectionConstructor();
+    $baroEtc->addSection( 'température '.WrapNumberSpell($temp_celcius) );
+    $baroEtc->addSection( 'point de rosée '.WrapNumberSpell($temp_dewpoint) );
+    $baroEtc->addSection( 'altimètre '.WrapNumberSpell($altimeter_hg) );
+    $atsResultFr->addSection( $baroEtc->returnResult() );
+
+    $procedures = New AtisSectionConstructor();
+    $procedures->addSection( 'approches IFR '.GetAirportAppRwysString($app_rwys, $app_type, 'fr') );
+    $procedures->addSection( 'departs '.GetAirportDepRwysString($dep_rwys, 'fr') );
+    $atsResultFr->addSection( $procedures->returnResult() );
+
+    if($notamsDemanded)
+    {
+        $notams = New AtisSectionConstructor();
+        foreach($thisArptNotams as $notam)
+        {
+            $this_notam_text =  $notam['fr'];
+    
+            $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
+
+            //var_dump($this_notam_text);
+
+            //var_dump($this_notam_text);
+            $this_notam_text = strtolower($this_notam_text);
+    
+	        $notams->addSection( $this_notam_text );
+        }
+        $atsResultFr->addSection( $notams->returnResult() );
+
+    }
+
+    $ending = New AtisSectionConstructor();
+    $ending->addSection( "Avisez l'ATC que vous avez l'informaton ".WrapLetter($infoLetter) );
+    $atsResultFr->addSection( $ending->returnResult() );
 
 }
-
-$ending = New AtisSectionConstructor();
-$ending->addSection( "Avisez l'ATC que vous avez l'informaton ".WrapLetter($infoLetter) );
-$atsResultFr->addSection( $ending->returnResult() );
-
-
 
 
 $basicInformations = New AtisSectionConstructor();
@@ -336,14 +372,14 @@ $windsEtc->addSection( 'visibility '.WrapNumberSpell($visibility) );
 $atsResultEn->addSection( $windsEtc->returnResult() );
 
 $precip = New AtisSectionConstructor();
-$precip->addSection( $precipitations_segmentStr );
+$precip->addSection( $precipitations_segmentStrEn );
 $atsResultEn->addSection( $precip->returnResult() );
 
 $clouds = New AtisSectionConstructor();
-if (strlen($cloudLayers_segmentStr) > 0 ){
-    $clouds->addSection( $cloudLayers_segmentStr );
+if (strlen($cloudLayers_segmentStrEn) > 0 ){
+    $clouds->addSection( $cloudLayers_segmentStrEn );
 } else {
-    $clouds->addSection( 'Sky clear');
+    $clouds->addSection( 'sky clear');
 }
 $atsResultEn->addSection( $clouds->returnResult() );
 
@@ -395,8 +431,6 @@ $atsResultEn->addSection( $ending->returnResult() );
 
 
 
-
-
 /*
 $windDirection = +$metarMatches['wind_dir'][0];
 $windDirection += 20;
@@ -424,8 +458,9 @@ $replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I
 
 $endString = '';
 
-$endString .= "\r\t\t".'(('."\r".$atsResultFr->returnResult()."\t\t".'))'."\r\r";
-$endString .=  iconv('WINDOWS-1252', 'UTF-8//TRANSLIT',str_replace($search, $replace,  $atsResultEn->returnResult()));
+if($bilingualDemanded) $endString .= "\r\t\t".'(('."\r".$atsResultFr->returnResult()."\t\t".'))'."\r\r\t";
+
+$endString .=  iconv('WINDOWS-1252', 'UTF-8//TRANSLIT', str_replace($search, $replace,  $atsResultEn->returnResult()));
 
 
 //echo  $atsResultEn->returnResult());
@@ -436,9 +471,16 @@ $endString = preg_replace ( '/(?<=\W|^)(\d{2}[R|D|L|G|C]?)\/(\d{2}[R|D|L|G|C]?)(
 
 $endString = iconv('UTF-8', 'WINDOWS-1252//TRANSLIT', $endString);
 
+$endString = "\t".$endString ;
+
 //echo "\t\r\t";
 //echo $outputFrenchText;
 echo $endString;
 
+/*
+    METAR example "CCCC YYGGggZ dddff(f)(Gfmfm) (KMH ou KT ou MPS) (dndndnVdxdxdx) VVVV(Dv) (VxVxVxVx(Dv)) ou CAVOK (RDRDR/VRVRVRVRI ou RDRDR/VRVRVR VRVVRVRVRVRI) w′w′(ww) (NsNsNshshshs ou VVhshshs ou SKC) T′T′/T′dT′d QPHPHPHPH REw'w' (WS TKOF RWYDRDR et/ou WS LDG RWYDRDR)"
+    https://fr.wikipedia.org/wiki/METAR
 
+
+*/
 ?>
