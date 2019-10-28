@@ -20,7 +20,6 @@ include_once('./resources/notams.lib.inc.php');
 
 define('DEBUG', false);
 
-
 $metarMatches = [];
 $metar = $_GET['metar'];
 $metarMainParts = [];
@@ -421,14 +420,19 @@ $outputEnglishText .= $metarMatches['clouds'][0].', ';
 
 //$outputEnglishText = $outputEnglishText.' A B C D E F G H J K L M N O P Q R S T U V W X Y Z ';
 //$outputEnglishText = $outputEnglishText;
-
+function stripAccents($str) {
+    return strtr($str, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïñòóôõöøùúûüýÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĹĺĻļĽľĿŀŁłŃńŅņŇňŉŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžſƒƠơƯưǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛǜǺǻǼǽǾǿ', 'AAAAAAAECEEEEIIIIDNOOOOOOUUUUYsaaaaaaaeceeeeiiiinoooooouuuuyyAaAaAaCcCcCcCcDdDdEeEeEeEeEeGgGgGgGgHhHhIiIiIiIiIiIJijJjKkLlLlLlLlllNnNnNnnOoOoOoOEoeRrRrRrSsSsSsSsTtTtTtUuUuUuUuUuUuWwYyYZzZzZzsfOoUuAaIiOoUuUuUuUuUuAaAEaeOo');
+}
 
 
 //var_dump($atsResult);
 
 echo "\r\t\t".'(('."\r".$atsResultFr->returnResult()."\t\t".'))'."\r\r";
 
-echo $atsResultEn->returnResult();
+$search = explode(",","ç,æ,œ,á,é,í,ó,ú,à,è,ì,ò,ù,ä,ë,ï,ö,ü,ÿ,â,ê,î,ô,û,å,e,i,ø,u");
+$replace = explode(",","c,ae,oe,a,e,i,o,u,a,e,i,o,u,a,e,i,o,u,y,a,e,i,o,u,a,e,i,o,u");
+//echo  $atsResultEn->returnResult());
+echo str_replace($search, $replace,iconv('WINDOWS-1252', 'UTF-8//TRANSLIT//IGNORE', $atsResultEn->returnResult()));
 //$outputEnglishText = NotamTextAdjustments::AdjustAndReturnText($outputEnglishText);
 
 

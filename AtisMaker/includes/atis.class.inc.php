@@ -37,11 +37,11 @@ class AtisConstructor {
             }
         }
         
-        $return_str = preg_replace ( '/(?<=\W)(\d{2}?)r(?=\W)/' , "$1R" , $return_str);
-        $return_str = preg_replace ( '/(?<=\W)(\d{2}?)l(?=\W)/' , "$1L" , $return_str);
-        $return_str = preg_replace ( '/(?<=\W)(\d{2}?)c(?=\W)/' , "$1C" , $return_str);
-        $return_str = preg_replace ( '/(?<=\W)(\d{2}?)d(?=\W)/' , "$1D" , $return_str);
-        $return_str = preg_replace ( '/(?<=\W)(\d{2}?)g(?=\W)/' , "$1G" , $return_str);
+        $return_str = preg_replace ( '/(?<=\W|^)(\d{2}?)r(?=\W|$)/' , "$1R" , $return_str);
+        $return_str = preg_replace ( '/(?<=\W|^)(\d{2}?)l(?=\W|$)/' , "$1L" , $return_str);
+        $return_str = preg_replace ( '/(?<=\W|^)(\d{2}?)c(?=\W|$)/' , "$1C" , $return_str);
+        $return_str = preg_replace ( '/(?<=\W|^)(\d{2}?)d(?=\W|$)/' , "$1D" , $return_str);
+        $return_str = preg_replace ( '/(?<=\W|^)(\d{2}?)g(?=\W|$)/' , "$1G" , $return_str);
                 $return_str = iconv('UTF-8', 'WINDOWS-1252//TRANSLIT//IGNORE', $return_str);
             //var_dump($this->all_sections);
             //var_dump(count($this->all_sections));
