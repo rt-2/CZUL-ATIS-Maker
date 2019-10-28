@@ -43,35 +43,40 @@ $GLOBALS['notams_array'] = [
 ];
 
 
+$GLOBALS['phonetic_alphabet'] = [
+	'A' => 'ALPHA',
+	'B' => 'BRAVO',
+	'C' => 'CHARLIE',
+	'D' => 'DELTA',
+	'E' => 'ECHO',
+	'F' => 'FOXTROT',
+	'G' => 'GOLF',
+	'H' => 'HOTEL',
+	'I' => 'INDIA',
+	'J' => 'JULIET',
+	'K' => 'KILO',
+	'L' => 'LEEMA',
+	'M' => 'MICK',
+	'N' => 'NOVEMBER',
+	'O' => 'OSCAR',
+	'P' => 'PAPA',
+	'Q' => 'QUEBEC',
+	'R' => 'ROMEO',
+	'S' => 'SIERRA',
+	'T' => 'TANGO',
+	'U' => 'UNIFORM',
+	'V' => 'VICTOR',
+	'W' => 'WHISKEY',
+	'X' => 'X-RAY',
+	'Y' => 'YANKEE',
+	'Z' => 'ZULU',
+];
 
+foreach($GLOBALS['phonetic_alphabet'] as $letter => $sound)
+{
+    New NotamTextAdjustments($letter , $sound);
+}
 
-New NotamTextAdjustments('A' , 'ALPHA');
-New NotamTextAdjustments('B' , 'BRAVO');
-New NotamTextAdjustments('C' , 'CHARLIE');
-New NotamTextAdjustments('D' , 'DELTA');
-New NotamTextAdjustments('E' , 'ECHO');
-New NotamTextAdjustments('F' , 'FOXTROT');
-New NotamTextAdjustments('G' , 'GOLF');
-New NotamTextAdjustments('H' , 'HOTEL');
-New NotamTextAdjustments('I' , 'INDIA');
-New NotamTextAdjustments('J' , 'JULIET');
-New NotamTextAdjustments('K' , 'KILO');
-New NotamTextAdjustments('L' , 'LEEMA');
-New NotamTextAdjustments('M' , 'MICK');
-New NotamTextAdjustments('N' , 'NOVEMBER');
-New NotamTextAdjustments('O' , 'OSCAR');
-New NotamTextAdjustments('P' , 'PAPA');
-New NotamTextAdjustments('Q' , 'QUEBEC');
-New NotamTextAdjustments('R' , 'ROMEO');
-New NotamTextAdjustments('S' , 'SIERRA');
-New NotamTextAdjustments('T' , 'TANGO');
-New NotamTextAdjustments('U' , 'UNIFORM');
-New NotamTextAdjustments('V' , 'VICTOR');
-New NotamTextAdjustments('W' , 'WHISKEY');
-New NotamTextAdjustments('X' , 'X-RAY');
-New NotamTextAdjustments('Y' , 'YANKEE');
-New NotamTextAdjustments('Z' , 'ZULU');
-    
 New NotamTextAdjustments('TWY', 'TAXIWAY');
 New NotamTextAdjustments('FM', 'FROM');
 New NotamTextAdjustments('RWY', 'RUNWAY');

@@ -3,7 +3,8 @@ function WrapLetter($infoLetter)
 {
     //$sign = '*';
     $sign = '';
-	return $sign.$infoLetter;
+	//return $sign.$infoLetter;
+	return '['.$infoLetter.']';
 };
 function WrapNumberWhole($infoNumber)
 {

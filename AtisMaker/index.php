@@ -65,8 +65,8 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 
 
 
-$notamsDemanded = isset($_GET['notams']);
-$bilingualDemanded = isset($_GET['qc']);
+$notamsDemanded = isset($_GET['ntm']);
+$bilingualDemanded = isset($_GET['fr']);
 
 
 MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','issue_date','issue_time'], '/^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$/');
@@ -124,7 +124,8 @@ function GetAirportNameString($icao, $lang)
 //var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str);
 //var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str);
 
-$infoLetter = $_GET['info'];
+$infoLetter = strToUpper($_GET['info']);
+$infoPhonetic = $GLOBALS['phonetic_alphabet'][$infoLetter];
 $infoZuluTime = str_replace('Z', ' Zulu', MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str);
 $windDirection = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str;
 $windVariaton = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str;
@@ -302,7 +303,7 @@ if($bilingualDemanded)
 {
 
     $basicInformations = New AtisSectionConstructor();
-    $basicInformations->addSection(  GetAirportNameString($airportICAO, 'fr').' renseignement '.WrapLetter($infoLetter) );
+    $basicInformations->addSection(  GetAirportNameString($airportICAO, 'fr').' renseignement '.WrapLetter($infoPhonetic) );
     $basicInformations->addSection( 'météo à '.WrapNumberSpell($infoZuluTime).' Zulu' );
     $atsResultFr->addSection( $basicInformations->returnResult() );
 
@@ -355,14 +356,14 @@ if($bilingualDemanded)
     }
 
     $ending = New AtisSectionConstructor();
-    $ending->addSection( "Avisez l'ATC que vous avez l'informaton ".WrapLetter($infoLetter) );
+    $ending->addSection( "Avisez l'ATC que vous avez l'informaton ".WrapLetter($infoPhonetic) );
     $atsResultFr->addSection( $ending->returnResult() );
 
 }
 
 
 $basicInformations = New AtisSectionConstructor();
-$basicInformations->addSection( GetAirportNameString($airportICAO, 'en').' information '.WrapLetter($infoLetter) );
+$basicInformations->addSection( GetAirportNameString($airportICAO, 'en').' information '.WrapLetter($infoPhonetic) );
 $basicInformations->addSection( 'weather at '.WrapNumberSpell($infoZuluTime).' Zulu' );
 $atsResultEn->addSection( $basicInformations->returnResult() );
 
@@ -394,7 +395,6 @@ $procedures->addSection( 'IFR approach '.GetAirportAppRwysString($app_rwys, $app
 $procedures->addSection( 'departures '.GetAirportDepRwysString($dep_rwys, 'en') );
 $atsResultEn->addSection( $procedures->returnResult() );
 
-
 if($notamsDemanded)
 {
 
@@ -425,7 +425,7 @@ if($notamsDemanded)
 
 //var_dump($atsResult);
 $ending = New AtisSectionConstructor();
-$ending->addSection( "Advise ATC that you have information ".WrapLetter($infoLetter) );
+$ending->addSection( "Advise ATC that you have information ".WrapLetter($infoPhonetic) );
 $atsResultEn->addSection( $ending->returnResult() );
 
 
@@ -478,6 +478,21 @@ $endString = "\t".$endString ;
 echo $endString;
 
 /*
+
+public static Regex StationId = new Regex ("^[A-Z]{4}$", RegexOptions.Compiled);
+public static Regex ReportTime = new Regex ("([0-9]{2})([0-9]{2})([0-9]{2})Z", RegexOptions.Compiled);
+public static Regex Wind = new Regex ("([0-9]{3}|VRB)([0-9]{2,3})G?([0-9]{2,3})?(KT|MPS|KMH)", RegexOptions.Compiled);
+public static Regex Visibility = new Regex ("^([0-9]{4})([NS]?[EW]?)$", RegexOptions.Compiled);
+public static Regex Clouds = new Regex ("^(VV|FEW|SCT|SKC|CLR||BKN|OVC)([0-9]{3}|///)(CU|CB|TCU|CI)?$", RegexOptions.Compiled);
+public static Regex TempAndDew = new Regex ("^(M?[0-9]{2})/(M?[0-9]{2})?$", RegexOptions.Compiled);
+public static Regex PressureHg = new Regex ("A([0-9]{4})", RegexOptions.Compiled);
+public static Regex PressureMb = new Regex ("Q([0-9]{4})", RegexOptions.Compiled);
+public static Regex Weather = new Regex ("^(VC)?(-|\\+)?(MI|PR|BC|DR|BL|SH|TS|FZ)?((DZ|RA|SN|SG|IC|PL|GR|GS|UP)+)?(BR|FG|FU|VA|DU|SA|HZ|PY)?(PO|SQ|FC|SS)?$", RegexOptions.Compiled);
+	
+
+
+
+
     METAR example "CCCC YYGGggZ dddff(f)(Gfmfm) (KMH ou KT ou MPS) (dndndnVdxdxdx) VVVV(Dv) (VxVxVxVx(Dv)) ou CAVOK (RDRDR/VRVRVRVRI ou RDRDR/VRVRVR VRVVRVRVRVRI) w′w′(ww) (NsNsNshshshs ou VVhshshs ou SKC) T′T′/T′dT′d QPHPHPHPH REw'w' (WS TKOF RWYDRDR et/ou WS LDG RWYDRDR)"
     https://fr.wikipedia.org/wiki/METAR
 
