@@ -21,7 +21,7 @@ function WrapNumberSpell($infoNumber)
     if((string)+$num_for_str_tests === (string)$num_for_str_tests)
     {
         //$sep = "\t"; $sign = '*';
-        $sep = ""; $sign = '';
+        $sep = "\r"; $sign = '';
         $length = strlen($num_for_str_results);
         $return_str .= $sep;
         for ($i=0; $i < $length; $i++) {
