@@ -27,7 +27,7 @@ $GLOBALS['notams_array'] = [
 		],
 		190430 => [
 			"en" => "Runway 10/28 closed, available as taxiway",
-			"fr" => "Piste 10/28 fermé, disponble comme taxiway",
+			"fr" => "Piste 10/28 fermÃ©, disponble comme taxiway",
 		],
 	],
 	"CYMX" => [
