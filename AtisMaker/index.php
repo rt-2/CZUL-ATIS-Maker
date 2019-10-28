@@ -431,7 +431,8 @@ $endString .=  iconv('WINDOWS-1252', 'UTF-8//TRANSLIT',str_replace($search, $rep
 //echo  $atsResultEn->returnResult());
 
 
-$endString = preg_replace ( '/(?<=\W|^)(\d{2}[R|D|L|G|C]?)\/(\d{2}[R|D|L|G|C]?)(?=\W|$)/' , "$1–$2" , $endString);
+$endString = preg_replace ( '/(?<=\W|^)(\d{2}[R|D|L|G|C]?)\/(\d{2}[R|D|L|G|C]?)(?=\W|$)/' , "$1".json_decode('"\u2013"')."$2" , $endString);
+
 
 $endString = iconv('UTF-8', 'WINDOWS-1252//TRANSLIT', $endString);
 
