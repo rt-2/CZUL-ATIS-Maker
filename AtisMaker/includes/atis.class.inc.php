@@ -60,7 +60,7 @@ class AtisSectionConstructor {
     
     public static $HEAD = "";
     public static $SEP = " , ";
-    public static $FOOT = " ;" ;
+    public static $FOOT = " . ";
 
     public $all_sections = [];
 
