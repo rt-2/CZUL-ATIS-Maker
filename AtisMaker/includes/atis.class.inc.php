@@ -4,7 +4,7 @@ class AtisConstructor {
     
     public static $HEAD = "\t";
     public static $SEP = " ";
-    public static $FOOT = " \r\t";
+    public static $FOOT = " \r\t\t";
 
     public $all_sections = [];
 

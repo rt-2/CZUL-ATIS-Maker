@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__).'/../resources/notams.lib.inc.php');
+
 class NotamTextAdjustments {
     
     public static $all_abbrevs = [];

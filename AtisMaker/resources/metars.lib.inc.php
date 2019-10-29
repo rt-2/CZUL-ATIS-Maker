@@ -25,7 +25,7 @@
 (new MetarMainPart())->SetNew('precip', '(?:\s?(?:\-|\+)?(?:[A-Z]{2}){1,3}(?=\s))*', false);
 (new MetarMainPart())->SetNew('clouds', '(?:SKC|CLR)|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,}', false);
 (new MetarMainPart())->SetNew('vert_vis', '(?<=VV)\d{3}', false);
-(new MetarMainPart())->SetNew('temp', 'M?\d{2}(?>=\/)');
+(new MetarMainPart())->SetNew('temp', 'M?\d{2}\/');
 (new MetarMainPart())->SetNew('dew', '(?<=\/)M?\d{2}');
 (new MetarMainPart())->SetNew('baro', '(?:A|Q)\d{4}');
 (new MetarMainPart())->SetNew('precip_recent', '(?:\s?RE(?:[A-Z]{2,4}))*', false);

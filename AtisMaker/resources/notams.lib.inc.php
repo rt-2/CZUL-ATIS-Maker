@@ -1,6 +1,5 @@
 <?php
 
-
 $GLOBALS['notams_array'] = [
 	'CYUL' => [
 		[

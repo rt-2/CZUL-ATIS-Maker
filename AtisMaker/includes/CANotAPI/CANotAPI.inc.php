@@ -10,6 +10,7 @@
     
     require_once(dirname(__FILE__).'/includes/definitions.inc.php');
     require_once(dirname(__FILE__).'/includes/notam.class.inc.php');
+    require_once(dirname(__FILE__).'/../resources/notams.lib.inc.php');
     
 
 	//
@@ -99,7 +100,7 @@
 			'filter[value]' => urlencode($airport),
 			'_' => urlencode(time()),
         ]);
-        var_dump($result);
+        //var_dump($result);
 		$result_json = json_decode($result, true);
         $airportGeoPoint = $result_json['data'][0]['geometry']['coordinates'];
         $airportName = $result_json['data'][0]['properties']['displayName'];
@@ -109,13 +110,13 @@
 			'_' => urlencode(time()),
         ]);
 
-		var_dump($result);
+		//var_dump($result);
 		$result_json = json_decode($result, true);
-		echo get($url);
+		//echo $result;
         
         $all_notams_list = $result_json['data'];
         
-		foreach($all_notams_list as $notam_data)
+		foreach((array) $all_notams_list as $notam_data)
 		{
             
 			$this_notam_isSearched = false;
@@ -124,28 +125,15 @@
             $this_notam_text = $notam_data['text'];
             $regex = "/^\((?<id>\w\d{4}\/\d{2})\X+(?:A\)\s(?<icao>\w{4})\s)(?:B\)\s(?<time_from>\d{10}(?:\w{3})?)\s)(?:C\)\s(?<time_to>\d{10}(?:\w{3})?)\s)(?:D\)\s(?<time_human>\X+)\s)?(?:E\)\s(?:(?:(?<message_en>\X+)\sFR:\s(?<message_fr>\X+)\)$)|(?:(?<message>\X+)\)$)))/mUu";
             
-            //echo '<br><br>';
-            //var_dump($this_notam_text);
             preg_match($regex, $this_notam_text, $matches);
-            //print_r(array_filter($matches));
             if(false)
             {
                 echo '<textarea>';
                 echo '<br>$regex<br>';
-                //var_dump($regex);
                 echo '</textarea>';
                 echo '<br>$notam_data<br>';
-                //var_dump($notam_data);
                 echo '<br>$matches<br>';
-                json_encode($matches);
-                var_dump($matches);
             }
-            
-            //echo '<br>';
-            //var_dump($matches['message_en']);
-            //var_dump($matches['message']);
-            
-            //echo '<br>';
 
             $this_notam_obj = New Notam([
                 'ident' => $matches['id'],
@@ -155,14 +143,6 @@
                 'time_human' => $matches['time_human'],
                 'text' => ( isset($matches['message_en']) && strlen($matches['message_en']) > 0 ? $matches['message_en'] : $matches['message'] ),
             ]);
-            //var_dump($search);
-            //var_dump($this_notam_obj);
-            //var_dump($airport);
-            //var_dump($this_notam_obj->GetAirport() === $airport);
-            
-            //echo '<br><br>';
-
-
 
             if($this_notam_obj->GetAirport() === $airport)
             {
@@ -172,8 +152,6 @@
             if($this_notam_isGoodAirport)
             {
 
-            
-
                 if(strpos($this_notam_obj->GetText(), 'RWY') !== false || strpos($this_notam_obj->GetText(), 'TWY') !== false)
                 {
                     $this_notam_isRelevant = true;
@@ -181,8 +159,6 @@
                 
                 if($this_notam_isRelevant)
                 {
-
-                
 
 			        if(!is_array($search))
 			        {
@@ -207,12 +183,9 @@
 			        if($this_notam_isSearched && $this_notam_isGoodAirport && $this_notam_isRelevant)
 			        {
 				        // Check if Notam has already been displayed
-				        //if(!isset($Already_Notam_List[$this_notam_id]))
-				        //{
+
 					        // Variables
-					        //$Already_Notam_List[$this_notam_id] = true;
 					        $classes = 'CANotAPI_Notam';
-					        //preg_match('/[0-9]{10} TIL[ A-Z]+[0-9]{10}/', $this_notam_text, $this_notam_active_text);
 					
 					        // Check if Notam contains validity times
 					        //if(isset( $this_notam_active_text[0] ))
@@ -241,7 +214,6 @@
 					
                             if(strlen($this_notam_obj->GetText()) > 0)
                             {
-                                var_dump($this_notam_obj);
 					            // Add Notam to return string
 					            $ret[] = $this_notam_obj;
                             }
