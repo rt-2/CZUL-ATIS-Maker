@@ -3,8 +3,8 @@
 class AtisConstructor {
     
     public static $HEAD = "\t";
-    public static $SEP = " \r\t";
-    public static $FOOT = "\r\t";
+    public static $SEP = " ";
+    public static $FOOT = " \r\t";
 
     public $all_sections = [];
 
@@ -59,8 +59,8 @@ class AtisConstructor {
 class AtisSectionConstructor {
     
     public static $HEAD = "";
-    public static $SEP = " , ";
-    public static $FOOT = " . ";
+    public static $SEP = " [,] ";
+    public static $FOOT = " [;] ";
 
     public $all_sections = [];
 

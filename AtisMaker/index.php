@@ -4,20 +4,19 @@ header('Content-Type: text/plain; charset=WINDOWS-1252');
 //header('Content-Type: text/plain; charset=ISO-8859-1');
 //header('Content-Type: text/plain; charset=UTF-8');
 
+
+    require_once('./includes/notam.class.inc.php');
 require_once('./includes/atis.class.inc.php');
-require_once('./includes/notam.class.inc.php');
 require_once('./includes/metar.class.inc.php');
 require_once('./includes/functions.inc.php');
+
+    require_once('./includes/CANotAPI/CANotAPI.inc.php');
 
 include_once('./resources/metars.lib.inc.php');
 include_once('./resources/airports.lib.inc.php');
 include_once('./resources/fir.data.inc.php');
-include_once('./resources/notams.lib.inc.php');
-
-
-
-?>
-<?php
+    include_once('./resources/notams.lib.inc.php');
+    
 
 define('DEBUG', false);
 
@@ -73,13 +72,18 @@ MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','i
 MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '/^(?P<wind_degree>\w{3})(?P<wind_speed>\w{2}(?:G\w{2})?KT)(?:\s(?P<wind_variaton>\d{3}V\d{3}))?$/');
 
 $airportICAO = MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['airport_icao']->result_str;
+global $atisEnabledAirports;
+
+//var_dump($airportICAO);
+//var_dump($atisEnabledAirports);
 
 $atisAvailable = in_array($airportICAO, $atisEnabledAirports);
 
 if(!$atisAvailable)
 {
     
-    echo $metar;
+    //echo $metar;
+    echo '(( There is no ATIS at \''.$airportICAO.'\' airport ))';
     exit();
 }
 
@@ -275,13 +279,31 @@ if(strtoupper($windDirection) !== 'VRB')
 if($notamsDemanded)
 {
     //Fetch NOTAMs
-    $thisArptNotams = [];
-    if(in_array($airportICAO, array_keys($GLOBALS['notams_array'])))
+    $GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
+    $notamsIds = file('../Notams/activeNotams.data.csv');
+    //echo "\nnotamsIds\n";
+    //var_dump($notamsIds);
+    foreach($notamsIds as $value)
     {
-	    $thisArptNotams = $GLOBALS['notams_array'][$airportICAO];
+        //echo "\nvalue\n";
+        //var_dump($value);
+        
+        $notam_id = trim(preg_replace("/(;.*$)/", '', $value));
+        //var_dump($notam_id);
+        if(strlen($notam_id) > 0)
+        {
+            $GLOBALS['ACTIVE_NOTAMS_IDS'][] = $notam_id;
+        }
+        //echo "\n\n";
     }
+    //echo "\nACTIVE_NOTAMS_IDS\n";
+    //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
+    //
+    $thisArptNotams = CANotAPI_GetNotamsArray($airportICAO, 'CLSD');
+    //var_dump($thisArptNotams);
 }
 
+ //echo "\n\n"; echo "\n\n";
 if(DEBUG)
 {
 	echo "\n\n";
@@ -338,25 +360,38 @@ if($bilingualDemanded)
     if($notamsDemanded)
     {
         $notams = New AtisSectionConstructor();
+	//echo "\n\n";
+	//echo "\n\n";
+	//echo "\n\n";
         foreach($thisArptNotams as $notam)
         {
-            $this_notam_text =  $notam['fr'];
+            //var_dump($notam);
     
-            $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
-
-            //var_dump($this_notam_text);
-
-            //var_dump($this_notam_text);
-            $this_notam_text = strtolower($this_notam_text);
+	        //echo "\nddddd\n";
+            //var_dump($notam->GetIdent());
+            //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
     
-	        $notams->addSection( $this_notam_text );
+	        //echo "\n\n";
+            if(in_array($notam->GetIdent(), $GLOBALS['ACTIVE_NOTAMS_IDS']))
+            {
+                $this_notam_text = $notam->GetText();
+    
+                $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
+
+                //var_dump($this_notam_text);
+
+                //var_dump($this_notam_text);
+                $this_notam_text = strtolower($this_notam_text);
+    
+	            $notams->addSection( $this_notam_text );
+            }
         }
         $atsResultFr->addSection( $notams->returnResult() );
 
     }
 
     $ending = New AtisSectionConstructor();
-    $ending->addSection( "Avisez l'ATC que vous avez l'informaton".json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
+    $ending->addSection( "Avisez l'ATC que vous avez l'information".json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
     $atsResultFr->addSection( $ending->returnResult() );
 
 }
@@ -401,22 +436,25 @@ if($notamsDemanded)
     $notams = New AtisSectionConstructor();
     foreach($thisArptNotams as $notam)
     {
-        $this_notam_text =  $notam['en'];
+        if(in_array($notam->GetIdent(), $GLOBALS['ACTIVE_NOTAMS_IDS']))
+        {
+            $this_notam_text =  $notam->GetText();
     
-        //var_dump($this_notam_text);
-        $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
+            //var_dump($this_notam_text);
+            $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
 
-        //var_dump($this_notam_text);
-        $this_notam_text = strtolower($this_notam_text);
+            //var_dump($this_notam_text);
+            $this_notam_text = strtolower($this_notam_text);
     
-                //echo '<br><br>'."\n\n";
-                //echo '<br><br>'."\n\n";
-                //echo '<br><br>'."\n\n";
+                    //echo '<br><br>'."\n\n";
+                    //echo '<br><br>'."\n\n";
+                    //echo '<br><br>'."\n\n";
 
     
-        //$this_notam_text[0] = strtoupper($this_notam_text[0]);
+            //$this_notam_text[0] = strtoupper($this_notam_text[0]);
 
-	    $notams->addSection( $this_notam_text );
+	        $notams->addSection( $this_notam_text );
+        }
     }
 
     $atsResultEn->addSection( $notams->returnResult() );
@@ -490,8 +528,8 @@ public static Regex PressureMb = new Regex ("Q([0-9]{4})", RegexOptions.Compiled
 public static Regex Weather = new Regex ("^(VC)?(-|\\+)?(MI|PR|BC|DR|BL|SH|TS|FZ)?((DZ|RA|SN|SG|IC|PL|GR|GS|UP)+)?(BR|FG|FU|VA|DU|SA|HZ|PY)?(PO|SQ|FC|SS)?$", RegexOptions.Compiled);
 	
 
-
-
+METAR REGEX
+(?:METAR|SPECI)?\s?(?<airportIcao>[A-Z0-9]{4})\s?(?<issue_year>\d{2})(?<issue_day>\d{2})(?<issue_hour>\d{2})Z\s?(?<auto>AUTO)?\s?(?<wind_deg>VRB|\d{3})(?<wind_speed>\d{2})(?:G(?<wind_gust>\d{2}))?KT\s?(?<wind_var>\d{3}V\d{3})?\s?(?:(?<vis>CAVOK|(?:\d{0,2}\s?(?:\d\/\d)?)SM))\s?(?<rvr>R\d{2}[R|C|L]?\/(?:M|(?:\d{4}V))?\d{4}FT(?:\/D)?)?\s?(?<precip>(?:\s?(?:\-|\+)?(?:[A-Z]{2}){1,3}(?=\s))*)\s?(?<clouds>(?:SKC|CLR)|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,})\s?(?:VV(?<vert_vis>\d{3}))?\s?(?<temp>M?\d{2})\/(?<dew>M?\d{2})\s?(?<baro>(?:A|Q)\d{4})\s?(?<precip_recent>(?:\s?RE(?:[A-Z]{2,4}))*)?\s?(?:\s?WS\s(?<windshear_to>(?:ALL RWY|(?:(?:TKOF RWY|LDG RWY)\d{2}[R|C|L]))))?\s?(?:\sRMK\s(?<rmk>.*))$
 
     METAR example "CCCC YYGGggZ dddff(f)(Gfmfm) (KMH ou KT ou MPS) (dndndnVdxdxdx) VVVV(Dv) (VxVxVxVx(Dv)) ou CAVOK (RDRDR/VRVRVRVRI ou RDRDR/VRVRVR VRVVRVRVRVRI) w′w′(ww) (NsNsNshshshs ou VVhshshs ou SKC) T′T′/T′dT′d QPHPHPHPH REw'w' (WS TKOF RWYDRDR et/ou WS LDG RWYDRDR)"
     https://fr.wikipedia.org/wiki/METAR

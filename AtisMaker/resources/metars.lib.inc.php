@@ -1,7 +1,7 @@
 <?php
 
 
-(new MetarMainPart())->SetNew('local', '\w{4}\s\d{2}\d{4}Z');
+(new MetarMainPart())->SetNew('local', '\w{4}\s\d{2}\d{4}Z(?: AUTO)?');
 (new MetarMainPart())->SetNew('winds', '(?>VRB|\d{3})\d{2}(?:G\d{2})?KT(?:\s\d{3}V\d{3})?');
 (new MetarMainPart())->SetNew('visibility', '(?:\d{1,2}|\d\/\d|\d\s\d\/\d)SM');
 (new MetarMainPart())->SetNew('precipitations', '(?:\-?[A-Z]{2}(?:\s?))*', false);

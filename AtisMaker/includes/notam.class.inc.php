@@ -36,6 +36,7 @@ class NotamTextAdjustments {
             //echo '<br><br>';
             $this_str = preg_replace ( $abbrev->getRegex() , $abbrev->getWord() , $this_str);
             $this_str = str_replace ( ',' , '' , $this_str);
+            $this_str = str_replace ( PHP_EOL  , '' , $this_str);
         }
         return $this_str;
     }

@@ -8,11 +8,9 @@
 	//
 	//
     
-    require_once('includes/definitions.inc.php');
-    require_once('includes/notam.class.inc.php');
+    require_once(dirname(__FILE__).'/includes/definitions.inc.php');
+    require_once(dirname(__FILE__).'/includes/notam.class.inc.php');
     
-    
-    $total_shown_notams = 0;
 
 	//
 	//	FUNCTION: CANotAPI_GetReadableDate
@@ -78,16 +76,14 @@
 	//	ARGUMENTS:
 	//		$airport: String of the canadian airport you want to search notams for;
 	//		$search: String or array of strings of keyword(s) that notam must contain to be shown;
-	//		$showFooter: Boolean default:true, set to false if you want to remove the footer or
-	//			alternatively change its style with class 'CANotAPI_Footer';
 	//	RETURNS: A string with all relevant notams.
 	//
-	function CANotAPI_GetNotamsString($airport, $search, $showFooter = true)
+	function CANotAPI_GetNotamsArray($airport, $search)
 	{
 		//
 		// Variables
 		//
-		$ret = '';
+		$ret = [];
 		$fields_string = '';
 		$airport = strtoupper($airport);
 		$time_format = 'ymdHi';
@@ -248,13 +244,7 @@
                             if(strlen($this_notam_obj->GetText()) > 0)
                             {
 					            // Add Notam to return string
-					            $ret .= '<span class="'.$classes.'">';
-					            $ret .= '<b>'.$this_notam_obj->GetAirport().'</b> - '.$this_notam_obj->GetIdent().'<br>';
-					            $ret .= $this_notam_obj->GetText().'<br>';
-					            $ret .= '<small><u>'.$this_notam_obj->GetTimeFrom().' to '.$this_notam_obj->GetTimeTo().'</u></small>';
-					            $ret .= '</span><br><br>';
-                                global $total_shown_notams;
-                                $total_shown_notams++;
+					            $ret[] = $this_notam_obj;
                             }
 				        //}
 			        }
@@ -334,44 +324,11 @@
 		}
         */
 		// Add footer
-		if($showFooter) $ret .= '<span class="CANotAPI_Footer"><small>Made possible by <a href="https://github.com/rt-2/CANotAPI" target="_blank">CANotAPI</a> (Canadian Notam API)</small></span><br><br>';
-		// Return string
+		// Return array
 		return $ret;
 	}
 	
-	//
-	//	FUNCTION: CANotAPI_EchoNotamsString
-	//	PURPOSE: echos the string of notams from an airport search
-	//	ARGUMENTS:
-	//		$airport: string of the canadian airport you want to search notams for;
-	//		$search: string or array of strings of keyword(s) that notam must contain to be shown;
-	//		$showFooter: Boolean default:true, set to false if you want to remove the footer or
-	//			alternatively change its style with class 'CANotAPI_Footer';
-	//	RETURNS: should return true;
-	//
-
-	function CANotAPI_EchoNotamsString($airport, $search, $showFooter = true)
-	{
-        global $total_shown_notams;
-        if(strlen($airport) > 0)
-        {
-		    echo CANotAPI_GetNotamsString($airport, $search, $showFooter);
-            echo '<br><br>';
-            echo '<small>';
-            echo 'Showing '.$total_shown_notams.' NOTAMs for '.$airport;
-            echo '</small>';
-        }
-		return true;
-	}
 	
     // Var(s)
 
-
-	//
-	//	CLASS: CANotAPI_Notam
-	//	PURPOSE: represent a NOTAM
-	//	ARGUMENTS:
-	//		$data: String of the url to be ;
-	//		$fields: Array of key/value containng the query data (GET);
-	//
 ?>
