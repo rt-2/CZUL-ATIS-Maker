@@ -111,12 +111,9 @@
 
 		
 		$result_json = json_decode($result, true);
-		
+        
         $all_notams_list = $result_json['data'];
         
-        //echo '<br /><br />';
-        
-
 		foreach($all_notams_list as $notam_data)
 		{
             
@@ -130,14 +127,14 @@
             //var_dump($this_notam_text);
             preg_match($regex, $this_notam_text, $matches);
             //print_r(array_filter($matches));
-            if(false)
+            if(true)
             {
                 echo '<textarea>';
                 echo '<br>$regex<br>';
-                var_dump($regex);
+                //var_dump($regex);
                 echo '</textarea>';
                 echo '<br>$notam_data<br>';
-                var_dump($notam_data);
+                //var_dump($notam_data);
                 echo '<br>$matches<br>';
                 json_encode($matches);
                 var_dump($matches);
@@ -243,6 +240,7 @@
 					
                             if(strlen($this_notam_obj->GetText()) > 0)
                             {
+                                var_dump($this_notam_obj);
 					            // Add Notam to return string
 					            $ret[] = $this_notam_obj;
                             }

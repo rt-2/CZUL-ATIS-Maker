@@ -33,6 +33,9 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 }
 $metar_regex = '/'.$metar_regex.'/mu';
 
+	echo "metar_regex";
+	echo json_encode($_GET);
+	echo "\n\n";
 
 
 /*
@@ -53,12 +56,17 @@ if(DEBUG)
 	echo "Main Regex :\n";
 	echo '"'.$metar_regex.'"';
 	echo "\n\n";
+	echo "Numbers :\n";
+	echo '$allMetarMainPartsByNames'.count(MetarMainPart::$allMetarMainPartsByNames).'"';
+	echo '$matches'.count($matches).'"';
+	echo "\n\n";
 }
 
 
 preg_match_all($metar_regex, $metar, $matches);
-
-
+var_dump(count(MetarMainPart::$allMetarMainPartsByNames));
+var_dump($matches);
+var_dump($matches['icao']);
 foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 {
 	$metarMainPart_obj->SetResultString($matches[$name][0]);
@@ -274,8 +282,8 @@ if($notamsDemanded)
     //var_dump($notamsIds);
     foreach($notamsIds as $value)
     {
-        //echo "\nvalue\n";
-        //var_dump($value);
+        echo "\nvalue\n";
+        var_dump($value);
         
         $notam_id = trim(preg_replace("/(;.*$)/", '', $value));
         //var_dump($notam_id);
@@ -283,7 +291,7 @@ if($notamsDemanded)
         {
             $GLOBALS['ACTIVE_NOTAMS_IDS'][] = $notam_id;
         }
-        //echo "\n\n";
+        echo "\n\n";
     }
     //echo "\nACTIVE_NOTAMS_IDS\n";
     //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
@@ -450,7 +458,7 @@ if($notamsDemanded)
 
 }
 
-//var_dump($atsResult);
+var_dump($atsResult);
 $ending = New AtisSectionConstructor();
 $ending->addSection( "Advise ATC that you have information".utf8_decode(json_decode('"\u00A0"')).WrapLetter($infoPhonetic) );
 $atsResultEn->addSection( $ending->returnResult() );
@@ -481,7 +489,7 @@ $search = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê'
 $replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', 'Α', 'α', 'Ε', 'ε', 'Ο', 'ο', 'Ω', 'ω', 'Ι', 'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η');
 
 
-//var_dump($atsResult);
+var_dump($atsResult);
 
 $endString = '';
 
@@ -490,7 +498,7 @@ if($bilingualDemanded) $endString .= "\r\t\t".'(('."\r".$atsResultFr->returnResu
 $endString .=  iconv('WINDOWS-1252', 'UTF-8//TRANSLIT', str_replace($search, $replace,  $atsResultEn->returnResult()));
 
 
-//echo  $atsResultEn->returnResult());
+echo $atsResultEn->returnResult();
 
 
 $endString = preg_replace ( '/(?<=\W|^)(\d{2}[R|D|L|G|C]?)\/(\d{2}[R|D|L|G|C]?)(?=\W|$)/' , "$1".json_decode('"\u2013"')."$2" , $endString);
