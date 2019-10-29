@@ -1,14 +1,36 @@
 <?php
 
+/*
+(?:METAR|SPECI)?\s?(?<icao>[A-Z0-9]{4})\s?
+(?<issue_year>\d{2})(?<issue_day>\d{2})(?<issue_hour>\d{2})Z\s?
+(?<auto>AUTO)?\s?(?<winds>(?:VRB|\d{3})\d{2}(?:G\d{2})?KT)\s?
+(?<wind_var>\d{3}V\d{3})?\s?(?:(?<vis>CAVOK|(?:\d{0,2}\s?(?:\d\/\d)?)SM))\s?
+(?<rvr>R\d{2}[R|C|L]?\/(?:M|(?:\d{4}V))?\d{4}FT(?:\/D)?)?\s?
+(?<precip>(?:\s?(?:\-|\+)?(?:[A-Z]{2}){1,3}(?=\s))*)\s?
+(?<clouds>(?:SKC|CLR)|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,})\s?
+(?:VV(?<vert_vis>\d{3}))?\s?
+(?<temp>M?\d{2})\/(?<dew>M?\d{2})\s?
+(?<baro>(?:A|Q)\d{4})\s?
+(?<precip_recent>(?:\s?RE(?:[A-Z]{2,4}))*)?\s?
+(?:\s?WS\s(?<windshear_to>(?:ALL RWY|(?:(?:TKOF RWY|LDG RWY)\d{2}[R|C|L]))))?\s?
+(?:\sRMK\s(?<rmk>.*))$
+*/
 
-(new MetarMainPart())->SetNew('local', '\w{4}\s\d{2}\d{4}Z(?: AUTO)?');
-(new MetarMainPart())->SetNew('winds', '(?>VRB|\d{3})\d{2}(?:G\d{2})?KT(?:\s\d{3}V\d{3})?');
-(new MetarMainPart())->SetNew('visibility', '(?:\d{1,2}|\d\/\d|\d\s\d\/\d)SM');
-(new MetarMainPart())->SetNew('precipitations', '(?:\-?[A-Z]{2}(?:\s?))*', false);
-(new MetarMainPart())->SetNew('clouds', 'SKC|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,}');
-(new MetarMainPart())->SetNew('temps', 'M?\d\d\/M?\d\d');
-(new MetarMainPart())->SetNew('altimeter', 'A\d{4}');
-(new MetarMainPart())->SetNew('remarks', 'RMK [[:ascii:]]*');
+(new MetarMainPart())->SetNew('icao', '[A-Z0-9]{4}');
+(new MetarMainPart())->SetNew('issue_time', '\d{6}(?:Z)');
+(new MetarMainPart())->SetNew('winds', '(?:VRB|\d{3})\d{2}(?:G\d{2})?(?:KT)');
+(new MetarMainPart())->SetNew('wind_var', '\d{3}V\d{3}', false);
+(new MetarMainPart())->SetNew('vis', 'CAVOK|(?:(?:\d{0,2})?\s?(?:\d\/\d)?)(?:SM)');
+(new MetarMainPart())->SetNew('rvr', '(?:\s?(?:R\d{2}[R|C|L]?\/[M|P]?\d{4}(?:V[M|P]?\d{4})?FT(?:\/[A-Z]{1})?)?)*', false);
+(new MetarMainPart())->SetNew('precip', '(?:\s?(?:\-|\+)?(?:[A-Z]{2}){1,3}(?=\s))*', false);
+(new MetarMainPart())->SetNew('clouds', '(?:SKC|CLR)|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,}', false);
+(new MetarMainPart())->SetNew('vert_vis', '(?<=VV)\d{3}', false);
+(new MetarMainPart())->SetNew('temp', 'M?\d{2}(?>=\/)');
+(new MetarMainPart())->SetNew('dew', '(?<=\/)M?\d{2}');
+(new MetarMainPart())->SetNew('baro', '(?:A|Q)\d{4}');
+(new MetarMainPart())->SetNew('precip_recent', '(?:\s?RE(?:[A-Z]{2,4}))*', false);
+(new MetarMainPart())->SetNew('windshear', 'WS\s(?:ALL RWY|(?:(?:TKOF RWY|LDG RWY)\d{2}[R|C|L]))', false);
+(new MetarMainPart())->SetNew('rmk', '(?:\sRMK\s).*');
 
 
 const METAR_PRECIP_DESCR_NAMES =

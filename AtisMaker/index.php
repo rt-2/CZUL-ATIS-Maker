@@ -5,20 +5,20 @@ header('Content-Type: text/plain; charset=WINDOWS-1252');
 //header('Content-Type: text/plain; charset=UTF-8');
 
 
-    require_once('./includes/notam.class.inc.php');
+require_once('./includes/notam.class.inc.php');
 require_once('./includes/atis.class.inc.php');
 require_once('./includes/metar.class.inc.php');
 require_once('./includes/functions.inc.php');
 
-    require_once('./includes/CANotAPI/CANotAPI.inc.php');
+require_once('./includes/CANotAPI/CANotAPI.inc.php');
 
 include_once('./resources/metars.lib.inc.php');
 include_once('./resources/airports.lib.inc.php');
 include_once('./resources/fir.data.inc.php');
-    include_once('./resources/notams.lib.inc.php');
+include_once('./resources/notams.lib.inc.php');
     
 
-define('DEBUG', false);
+define('DEBUG', true);
 
 $metarMatches = [];
 $metar = $_GET['metar'];
@@ -29,14 +29,13 @@ $metar_regex = '';
 foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 {
 	
-	$metar_regex .= $metarMainPart_obj->regex.'\s?';
+	$metar_regex .= $metarMainPart_obj->regex."\s?";
 }
 $metar_regex = '/'.$metar_regex.'/mu';
 
 
-/*
-echo $metar_regex;
 
+/*
 $main_local_regex.'\s?'.$main_wind_regex.'\s?'.$main_visibility_regex.'\s?'.$main_precipitation_regex.'\s?'.$main_cloud_regex.'\s?'.$main_temp_regex.'\s?'.$main_altimeter_regex.'\s?RMK\s'.$main_remark_regex;
 $winds_regex = '/(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z\s(?P<winds>\d{5}(?:G\d{2})?KT)\s(?P<visibility>\d{1,2})SM\s(?P<precipitations>(?:(?:(?:\-|\+)?[A-Z]{2})\s){0,})(?P<clouds>(?:(?:FEW|BKN|SCT|OVC)\d{3}\s){0,})(?P<temperature>\d{2})\/(?P<dewPoint>\d{2})\sA(?P<altimeter>\d{4}) RMK (?P<remarks>[[:ascii:]]*)';
 */
@@ -52,40 +51,31 @@ if(DEBUG)
 	echo $metar;
 	echo "\n\n";
 	echo "Main Regex :\n";
-	echo $metar_regex;
+	echo '"'.$metar_regex.'"';
 	echo "\n\n";
 }
 
+
 preg_match_all($metar_regex, $metar, $matches);
+
+
 foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 {
 	$metarMainPart_obj->SetResultString($matches[$name][0]);
-}
 
+}
 
 
 $notamsDemanded = isset($_GET['ntm']);
 $bilingualDemanded = isset($_GET['fr']);
 
 
-MetarMainPart::$allMetarMainPartsByNames['local']->addSubPart(['airport_icao','issue_date','issue_time'], '/^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$/');
-MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '/^(?P<wind_degree>\w{3})(?P<wind_speed>\w{2}(?:G\w{2})?KT)(?:\s(?P<wind_variaton>\d{3}V\d{3}))?$/');
+//MetarMainPart::$allMetarMainPartsByNames['icao']->addSubPart(['airport_icao','issue_date','issue_time'], '/^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$/');
+MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '/^(VRB|\d{3})\d{2}(?:G\d{2})?(?:KT)$/');
 
-$airportICAO = MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['airport_icao']->result_str;
 global $atisEnabledAirports;
 
-//var_dump($airportICAO);
-//var_dump($atisEnabledAirports);
 
-$atisAvailable = in_array($airportICAO, $atisEnabledAirports);
-
-if(!$atisAvailable)
-{
-    
-    //echo $metar;
-    echo '(( There is no ATIS at \''.$airportICAO.'\' airport ))';
-    exit();
-}
 
 
 //if(DEBUG)
@@ -128,11 +118,12 @@ function GetAirportNameString($icao, $lang)
 //var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str);
 //var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str);
 
+$airportICAO = MetarMainPart::$allMetarMainPartsByNames['icao']->result_str;
 $infoLetter = strToUpper($_GET['info']);
 $infoPhonetic = $GLOBALS['phonetic_alphabet'][$infoLetter];
-$infoZuluTime = str_replace('Z', ' Zulu', MetarMainPart::$allMetarMainPartsByNames['local']->subPartsByNames['issue_time']->result_str);
-$windDirection = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str;
-$windVariaton = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str;
+$infoZuluTime = str_replace('Z', '', MetarMainPart::$allMetarMainPartsByNames['issue_time']->result_str);
+$windDirection = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_deg']->result_str;
+$windVariaton = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_var']->result_str;
 $windVariatonList = explode('V', $windVariaton);
 $windSpeeds = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str;
 
@@ -140,8 +131,8 @@ preg_match_all('/(?P<speed_kts>(?<=^)\d\d)(?:G(?P<speed_gust>(?<=G)\d\d))?KT$/',
 $windSpeed_kts = +$speedMatches['speed_kts'][0];
 $windSpeed_gust = +$speedMatches['speed_gust'][0];
 
-$visibility = str_replace('SM', '', MetarMainPart::$allMetarMainPartsByNames['visibility']->result_str);
-$precipitations = MetarMainPart::$allMetarMainPartsByNames['precipitations']->result_str;
+$visibility = str_replace('SM', '', MetarMainPart::$allMetarMainPartsByNames['issue_time']->result_str);
+$precipitations = MetarMainPart::$allMetarMainPartsByNames['precip']->result_str;
 $precipitations_array = explode(" ", $precipitations);
 $precipitations_segmentArr = [];
 $precipitations_segmentStrFr = '';
@@ -237,11 +228,9 @@ foreach($clouds_array as $cloudLayer)
 }
 $cloudLayers_segmentStrFr = implode(" , ", $cloudLayers_segmentArrFr);
 $cloudLayers_segmentStrEn = implode(" , ", $cloudLayers_segmentArrEn);
-$temps = MetarMainPart::$allMetarMainPartsByNames['temps']->result_str;
-$temps_array = explode("/", str_replace("M", "-", $temps));
-$temp_celcius = +preg_replace('((?=0)\d)', '$1', $temps_array[0]);
-$temp_dewpoint = +preg_replace('((?=0)\d)', '$1', $temps_array[1]);
-$altimeter_hg = substr(MetarMainPart::$allMetarMainPartsByNames['altimeter']->result_str, 1);
+$temp_celcius =  MetarMainPart::$allMetarMainPartsByNames['temp']->result_str;
+$temp_dewpoint =  MetarMainPart::$allMetarMainPartsByNames['dew']->result_str;
+$altimeter_hg = substr(MetarMainPart::$allMetarMainPartsByNames['baro']->result_str, 1);
 $dep_rwys = $_GET['dep'];
 $dep_rwys_str = '';
 function GetAirportDepRwysString($dep_rwys, $lang)
@@ -299,8 +288,8 @@ if($notamsDemanded)
     //echo "\nACTIVE_NOTAMS_IDS\n";
     //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
     //
-    $thisArptNotams = CANotAPI_GetNotamsArray($airportICAO, 'CLSD');
-    //var_dump($thisArptNotams);
+    $GLOBALS['ACTIVE_NOTAMS_IDS'] = CANotAPI_GetNotamsArray($airportICAO, 'CLSD');
+    var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
 }
 
  //echo "\n\n"; echo "\n\n";
@@ -363,7 +352,7 @@ if($bilingualDemanded)
 	//echo "\n\n";
 	//echo "\n\n";
 	//echo "\n\n";
-        foreach($thisArptNotams as $notam)
+        foreach($GLOBALS['ACTIVE_NOTAMS_IDS'] as $notam)
         {
             //var_dump($notam);
     
@@ -372,7 +361,7 @@ if($bilingualDemanded)
             //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
     
 	        //echo "\n\n";
-            if(in_array($notam->GetIdent(), $GLOBALS['ACTIVE_NOTAMS_IDS']))
+            if(in_array($notam->GetIdent(), $atisEnabledAirports))
             {
                 $this_notam_text = $notam->GetText();
     
@@ -434,9 +423,9 @@ if($notamsDemanded)
 {
 
     $notams = New AtisSectionConstructor();
-    foreach($thisArptNotams as $notam)
+    foreach($GLOBALS['ACTIVE_NOTAMS_IDS'] as $notam)
     {
-        if(in_array($notam->GetIdent(), $GLOBALS['ACTIVE_NOTAMS_IDS']))
+        if(in_array($notam->GetIdent(), $atisEnabledAirports))
         {
             $this_notam_text =  $notam->GetText();
     
@@ -529,7 +518,6 @@ public static Regex Weather = new Regex ("^(VC)?(-|\\+)?(MI|PR|BC|DR|BL|SH|TS|FZ
 	
 
 METAR REGEX
-(?:METAR|SPECI)?\s?(?<airportIcao>[A-Z0-9]{4})\s?(?<issue_year>\d{2})(?<issue_day>\d{2})(?<issue_hour>\d{2})Z\s?(?<auto>AUTO)?\s?(?<wind_deg>VRB|\d{3})(?<wind_speed>\d{2})(?:G(?<wind_gust>\d{2}))?KT\s?(?<wind_var>\d{3}V\d{3})?\s?(?:(?<vis>CAVOK|(?:\d{0,2}\s?(?:\d\/\d)?)SM))\s?(?<rvr>R\d{2}[R|C|L]?\/(?:M|(?:\d{4}V))?\d{4}FT(?:\/D)?)?\s?(?<precip>(?:\s?(?:\-|\+)?(?:[A-Z]{2}){1,3}(?=\s))*)\s?(?<clouds>(?:SKC|CLR)|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,})\s?(?:VV(?<vert_vis>\d{3}))?\s?(?<temp>M?\d{2})\/(?<dew>M?\d{2})\s?(?<baro>(?:A|Q)\d{4})\s?(?<precip_recent>(?:\s?RE(?:[A-Z]{2,4}))*)?\s?(?:\s?WS\s(?<windshear_to>(?:ALL RWY|(?:(?:TKOF RWY|LDG RWY)\d{2}[R|C|L]))))?\s?(?:\sRMK\s(?<rmk>.*))$
 
     METAR example "CCCC YYGGggZ dddff(f)(Gfmfm) (KMH ou KT ou MPS) (dndndnVdxdxdx) VVVV(Dv) (VxVxVxVx(Dv)) ou CAVOK (RDRDR/VRVRVRVRI ou RDRDR/VRVRVR VRVVRVRVRVRI) w′w′(ww) (NsNsNshshshs ou VVhshshs ou SKC) T′T′/T′dT′d QPHPHPHPH REw'w' (WS TKOF RWYDRDR et/ou WS LDG RWYDRDR)"
     https://fr.wikipedia.org/wiki/METAR

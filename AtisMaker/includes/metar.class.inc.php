@@ -39,7 +39,7 @@ class MetarMainPart extends MetarPart
 	public function SetNew($name, $regex, $alwaysThere = true)
 	{
 		$this->name=$name;
-		$this->regex = '(?<'.$name.'>(?<=\s)?'.$regex.'(?=\s)?)'.($alwaysThere === false ? '?' : '');
+		$this->regex = '(?<'.$name.'>'.$regex.')'.($alwaysThere === false ? '?' : '');
 		self::$allMetarMainPartsByNames[$name] = $this;
 	}
 	public function addSubPart($names, $regex)

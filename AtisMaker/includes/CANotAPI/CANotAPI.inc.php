@@ -176,7 +176,7 @@
 
             
 
-                if(strpos($this_notam_obj->GetText(), 'RWY') !== false || strpos($this_notam_obj->GetText(), 'TXY') !== false)
+                if(strpos($this_notam_obj->GetText(), 'RWY') !== false || strpos($this_notam_obj->GetText(), 'TWY') !== false)
                 {
                     $this_notam_isRelevant = true;
                 }
