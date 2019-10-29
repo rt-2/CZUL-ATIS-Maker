@@ -303,12 +303,12 @@ if($bilingualDemanded)
 {
 
     $basicInformations = New AtisSectionConstructor();
-    $basicInformations->addSection(  GetAirportNameString($airportICAO, 'fr').' renseignement '.WrapLetter($infoPhonetic) );
+    $basicInformations->addSection(  GetAirportNameString($airportICAO, 'fr').' renseignement'.json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
     $basicInformations->addSection( 'météo à '.WrapNumberSpell($infoZuluTime).' Zulu' );
     $atsResultFr->addSection( $basicInformations->returnResult() );
 
     $windsEtc = New AtisSectionConstructor();
-    $windsEtc->addSection( 'vent '. ( $windDirection === 'VRB' ? 'Variable' : WrapNumberSpell($windDirection) ).' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales Ã Â  '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " variant entre ".$windVariatonList[0].' et '.$windVariatonList[1] : '') );
+    $windsEtc->addSection( 'vent '. ( $windDirection === 'VRB' ? 'variable' : WrapNumberSpell($windDirection) ).' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales Ã Â  '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " variant entre ".$windVariatonList[0].' et '.$windVariatonList[1] : '') );
     $windsEtc->addSection( 'visibilité '.WrapNumberSpell($visibility) );
     $atsResultFr->addSection( $windsEtc->returnResult() );
 
@@ -332,7 +332,7 @@ if($bilingualDemanded)
 
     $procedures = New AtisSectionConstructor();
     $procedures->addSection( 'approches IFR '.GetAirportAppRwysString($app_rwys, $app_type, 'fr') );
-    $procedures->addSection( 'departs '.GetAirportDepRwysString($dep_rwys, 'fr') );
+    $procedures->addSection( 'départs '.GetAirportDepRwysString($dep_rwys, 'fr') );
     $atsResultFr->addSection( $procedures->returnResult() );
 
     if($notamsDemanded)
@@ -356,14 +356,14 @@ if($bilingualDemanded)
     }
 
     $ending = New AtisSectionConstructor();
-    $ending->addSection( "Avisez l'ATC que vous avez l'informaton ".WrapLetter($infoPhonetic) );
+    $ending->addSection( "Avisez l'ATC que vous avez l'informaton".json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
     $atsResultFr->addSection( $ending->returnResult() );
 
 }
 
 
 $basicInformations = New AtisSectionConstructor();
-$basicInformations->addSection( GetAirportNameString($airportICAO, 'en').' information '.WrapLetter($infoPhonetic) );
+$basicInformations->addSection( GetAirportNameString($airportICAO, 'en').' information'.utf8_decode(json_decode('"\u00A0"')).WrapLetter($infoPhonetic) );
 $basicInformations->addSection( 'weather at '.WrapNumberSpell($infoZuluTime).' Zulu' );
 $atsResultEn->addSection( $basicInformations->returnResult() );
 
@@ -425,7 +425,7 @@ if($notamsDemanded)
 
 //var_dump($atsResult);
 $ending = New AtisSectionConstructor();
-$ending->addSection( "Advise ATC that you have information ".WrapLetter($infoPhonetic) );
+$ending->addSection( "Advise ATC that you have information".utf8_decode(json_decode('"\u00A0"')).WrapLetter($infoPhonetic) );
 $atsResultEn->addSection( $ending->returnResult() );
 
 
