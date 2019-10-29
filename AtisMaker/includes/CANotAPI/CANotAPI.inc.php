@@ -353,9 +353,9 @@
 	function CANotAPI_EchoNotamsString($airport, $search, $showFooter = true)
 	{
         global $total_shown_notams;
-		echo CANotAPI_GetNotamsString($airport, $search, $showFooter);
         if(strlen($airport) > 0)
         {
+		    echo CANotAPI_GetNotamsString($airport, $search, $showFooter);
             echo '<br><br>';
             echo '<small>';
             echo 'Showing '.$total_shown_notams.' NOTAMs for '.$airport;
