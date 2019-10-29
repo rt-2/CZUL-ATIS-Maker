@@ -99,18 +99,19 @@
 			'filter[value]' => urlencode($airport),
 			'_' => urlencode(time()),
         ]);
+        var_dump($result);
 		$result_json = json_decode($result, true);
         $airportGeoPoint = $result_json['data'][0]['geometry']['coordinates'];
         $airportName = $result_json['data'][0]['properties']['displayName'];
 		$result = CANotAPI_GetUrlData('https://plan.navcanada.ca/weather/api/alpha/', [
 			'point' => urlencode($airportGeoPoint[0].','.$airportGeoPoint[1].','.$airport.',site'),
 			'alpha' => urlencode('notam'),
-			'metar_historical_hours' => urlencode('1'),
 			'_' => urlencode(time()),
         ]);
 
-		
+		var_dump($result);
 		$result_json = json_decode($result, true);
+		echo get($url);
         
         $all_notams_list = $result_json['data'];
         
@@ -127,7 +128,7 @@
             //var_dump($this_notam_text);
             preg_match($regex, $this_notam_text, $matches);
             //print_r(array_filter($matches));
-            if(true)
+            if(false)
             {
                 echo '<textarea>';
                 echo '<br>$regex<br>';

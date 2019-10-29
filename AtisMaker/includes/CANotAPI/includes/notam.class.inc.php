@@ -12,7 +12,8 @@ class Notam
 
     public function __construct($configArray) {
     
-
+    
+        if(isset($configArray['ident'])) $this->ident = $configArray['ident'];
         if(isset($configArray['ident'])) $this->ident = $configArray['ident'];
         if(isset($configArray['airport'])) $this->airport = $configArray['airport'];
         if(isset($configArray['time_from'])) $this->time_from = $configArray['time_from'];

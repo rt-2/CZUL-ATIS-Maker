@@ -9,6 +9,7 @@ require_once('./includes/notam.class.inc.php');
 require_once('./includes/atis.class.inc.php');
 require_once('./includes/metar.class.inc.php');
 require_once('./includes/functions.inc.php');
+require_once('./includes/curl.class.inc.php');
 
 require_once('./includes/CANotAPI/CANotAPI.inc.php');
 
@@ -18,7 +19,7 @@ include_once('./resources/fir.data.inc.php');
 include_once('./resources/notams.lib.inc.php');
     
 
-define('DEBUG', true);
+define('DEBUG', isset($_GET['debug']));
 
 $metarMatches = [];
 $metar = $_GET['metar'];
@@ -31,13 +32,15 @@ foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
 	
 	$metar_regex .= $metarMainPart_obj->regex."\s?";
 }
-$metar_regex = '/'.$metar_regex.'/mu';
+$metar_regex = "/".$metar_regex."/mu";
 
-	echo "metar_regex";
-	echo json_encode($_GET);
-	echo "\n\n";
+echo "metar_regex";
+echo $metar_regex;
+echo "\n\n";
 
 
+$req = (new HttpCurl())->get('http://rt2.czulfir.com/AtisMaker/?apptype=ILS&fr&ntm&metar=CYUL%20291132Z%2034003KT%202%201/2SM%20BCFG%20BKN001%20BKN250%2004/04%20A3018%20RMK%20SF5CI2%20VIS%20S%20W%20N%201/2%20SLP223&arr=24L&dep=24L&info=H&arr=24L&dep=24L&info=H');
+echo $req->getBody();
 /*
 $main_local_regex.'\s?'.$main_wind_regex.'\s?'.$main_visibility_regex.'\s?'.$main_precipitation_regex.'\s?'.$main_cloud_regex.'\s?'.$main_temp_regex.'\s?'.$main_altimeter_regex.'\s?RMK\s'.$main_remark_regex;
 $winds_regex = '/(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z\s(?P<winds>\d{5}(?:G\d{2})?KT)\s(?P<visibility>\d{1,2})SM\s(?P<precipitations>(?:(?:(?:\-|\+)?[A-Z]{2})\s){0,})(?P<clouds>(?:(?:FEW|BKN|SCT|OVC)\d{3}\s){0,})(?P<temperature>\d{2})\/(?P<dewPoint>\d{2})\sA(?P<altimeter>\d{4}) RMK (?P<remarks>[[:ascii:]]*)';
@@ -57,8 +60,10 @@ if(DEBUG)
 	echo '"'.$metar_regex.'"';
 	echo "\n\n";
 	echo "Numbers :\n";
-	echo '$allMetarMainPartsByNames'.count(MetarMainPart::$allMetarMainPartsByNames).'"';
-	echo '$matches'.count($matches).'"';
+	echo "\nallMetarMainPartsByNames :\n";
+	echo count($matches);
+	echo "\nmatches :\n";
+	echo count(MetarMainPart::$allMetarMainPartsByNames);
 	echo "\n\n";
 }
 
@@ -84,6 +89,7 @@ MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wi
 global $atisEnabledAirports;
 
 
+$GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
 
 
 //if(DEBUG)
@@ -276,14 +282,13 @@ if(strtoupper($windDirection) !== 'VRB')
 if($notamsDemanded)
 {
     //Fetch NOTAMs
-    $GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
     $notamsIds = file('../Notams/activeNotams.data.csv');
     //echo "\nnotamsIds\n";
     //var_dump($notamsIds);
     foreach($notamsIds as $value)
     {
-        echo "\nvalue\n";
-        var_dump($value);
+        //echo "\nvalue\n";
+        //var_dump($value);
         
         $notam_id = trim(preg_replace("/(;.*$)/", '', $value));
         //var_dump($notam_id);
@@ -291,13 +296,13 @@ if($notamsDemanded)
         {
             $GLOBALS['ACTIVE_NOTAMS_IDS'][] = $notam_id;
         }
-        echo "\n\n";
     }
     //echo "\nACTIVE_NOTAMS_IDS\n";
-    //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
+    //var_dump($airportICAO);
     //
     $GLOBALS['ACTIVE_NOTAMS_IDS'] = CANotAPI_GetNotamsArray($airportICAO, 'CLSD');
-    var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
+    //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
+    var_dump( CANotAPI_GetNotamsArray($airportICAO, 'CLSD'));
 }
 
  //echo "\n\n"; echo "\n\n";
@@ -458,7 +463,7 @@ if($notamsDemanded)
 
 }
 
-var_dump($atsResult);
+//var_dump($atsResult);
 $ending = New AtisSectionConstructor();
 $ending->addSection( "Advise ATC that you have information".utf8_decode(json_decode('"\u00A0"')).WrapLetter($infoPhonetic) );
 $atsResultEn->addSection( $ending->returnResult() );
@@ -489,7 +494,7 @@ $search = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê'
 $replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', 'Α', 'α', 'Ε', 'ε', 'Ο', 'ο', 'Ω', 'ω', 'Ι', 'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η');
 
 
-var_dump($atsResult);
+//var_dump($atsResult);
 
 $endString = '';
 

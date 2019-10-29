@@ -17,8 +17,8 @@
 */
 
 (new MetarMainPart())->SetNew('icao', '[A-Z0-9]{4}');
-(new MetarMainPart())->SetNew('issue_time', '\d{6}(?:Z)');
-(new MetarMainPart())->SetNew('winds', '(?:VRB|\d{3})\d{2}(?:G\d{2})?(?:KT)');
+(new MetarMainPart())->SetNew('issue_time', '\d{6}Z');
+(new MetarMainPart())->SetNew('winds', '(?:VRB|\d{3})\d{2}(?:G\d{2})?KT');
 (new MetarMainPart())->SetNew('wind_var', '\d{3}V\d{3}', false);
 (new MetarMainPart())->SetNew('vis', 'CAVOK|(?:(?:\d{0,2})?\s?(?:\d\/\d)?)(?:SM)');
 (new MetarMainPart())->SetNew('rvr', '(?:\s?(?:R\d{2}[R|C|L]?\/[M|P]?\d{4}(?:V[M|P]?\d{4})?FT(?:\/[A-Z]{1})?)?)*', false);
