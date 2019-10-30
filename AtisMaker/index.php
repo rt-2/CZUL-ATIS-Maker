@@ -89,8 +89,7 @@ if(DEBUG)
     //(?:\sRMK\s).*
 
 
-    //preg_match_all($metar_regex, $metar, $matches);
-    $metarMainPart_Infos = [ ];
+    $metarMainPart_Infos = [];
     foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
     {
 	    $metarMainPart_Infos[$name] = $metarMainPart_obj->SetResultString($matches[$name][0]);
@@ -100,6 +99,7 @@ if(DEBUG)
     foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
     {
         echo $name.' : ';
+    //preg_match_all($metar_regex, $metar, $matches);
         echo '   ';
         echo MetarMainPart::$allMetarMainPartsByNames[$name]->result_str;
         echo "\n";
