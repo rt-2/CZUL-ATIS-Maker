@@ -6,7 +6,7 @@ Web Page to create ATIS text when receiving a reques
 
         - Bilingual ATIS (Text, voice will only be english);
 
-        - All caps text;\n
+        - All caps text;
 
 
 # There different branches for different ATIS clients
