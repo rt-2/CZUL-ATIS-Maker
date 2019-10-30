@@ -13,5 +13,6 @@ Web Page to create ATIS text when receiving a reques
 
 
 # Other available URLs in case of outages. (not mine)
-        • http://uniatis.net/atis.php?metar=    
-        • http://vacchun.hu/td/esmetar.php?metar=       
+        • http://uniatis.net/atis.php?metar=
+        • http://vacchun.hu/td/esmetar.php?metar=
+        • https://atis-pt.herokuapp.com/?metar=
