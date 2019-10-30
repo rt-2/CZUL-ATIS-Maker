@@ -30,13 +30,13 @@ define('DEBUG', isset($_GET['debug']) );
 if(DEBUG) "Debug Mode ON.\n\n";
 
 
-$metar_regex = '';
-foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
-{
+//$metar_regex = '';
+//foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
+//{
 	
-	$metar_regex .= $metarMainPart_obj->regex."\s?";
-}
-$metar_regex = "/".$metar_regex."/mu";
+//    $metar_regex .= $metarMainPart_obj->regex."\s?";
+//}
+//$metar_regex = "/".$metar_regex."/mu";
 
 //echo "metar_regex";
 //echo $metar_regex;
@@ -53,9 +53,23 @@ $winds_regex = '/(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z\s(?P<
 */
 //(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z
 
+
+global $atisEnabledAirports;
+$GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
+
+
+$notamsDemanded = isset($_GET['ntm']);
+$bilingualDemanded = isset($_GET['fr']);
+$upperCaseDemanded = isset($_GET['cap']);
+$bilingualDemanded = isset($_GET['fr']);
+$capitalDemanded = isset($_GET['cap']);
+$helpDemanded = isset($_GET['help']);
+
+
 if(DEBUG)
 {
 	echo "\n\n";
+	echo "$_GET\n";
 	echo "Parameters :\n";
 	echo json_encode($_GET);
 	echo "\n\n";
@@ -72,33 +86,33 @@ if(DEBUG)
 	echo count(MetarMainPart::$allMetarMainPartsByNames);
 	echo "\n\n";
 }
+    //(?:\sRMK\s).*
 
 
-preg_match_all($metar_regex, $metar, $matches);
-//var_dump(count(MetarMainPart::$allMetarMainPartsByNames));
-//var_dump($matches);
-//var_dump($matches['icao']);
-foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
-{
-	$metarMainPart_obj->SetResultString($matches[$name][0]);
-
-}
+    //preg_match_all($metar_regex, $metar, $matches);
+    $metarMainPart_Infos = [ ];
+    foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
+    {
+	    $metarMainPart_Infos[$name] = $metarMainPart_obj->SetResultString($matches[$name][0]);
+    }
 
 
-$helpDemanded = isset($_GET['help']);
-$notamsDemanded = isset($_GET['ntm']);
-$bilingualDemanded = isset($_GET['fr']);
-$upperCaseDemanded = isset($_GET['cap']);
-$bilingualDemanded = isset($_GET['fr']);
-$capitalDemanded = isset($_GET['cap']);
-$helpDemanded = isset($_GET['help']);
+    foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
+    {
+        echo $name.' : ';
+        echo '   ';
+        echo MetarMainPart::$allMetarMainPartsByNames[$name]->result_str;
+        echo "\n";
+        foreach($metarMainPart_obj->subPartsByNames as $name => $metarPart_obj)
+        {
+            echo '   '.$name.' : ';
+            echo $metarPart_obj->result_str;
+            echo "\n";
+			
+        }
+    }
 
-//MetarMainPart::$allMetarMainPartsByNames['icao']->addSubPart(['airport_icao','issue_date','issue_time'], '/^(?P<airport_icao>\w{4})\s(?P<issue_date>\d{2})(?P<issue_time>\d{4})Z$/');
-MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_variaton'], '/^(VRB|\d{3})\d{2}(?:G\d{2})?(?:KT)$/');
 
-global $atisEnabledAirports;
-
-$GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
 
 
 
@@ -110,32 +124,18 @@ if($helpDemanded)
     echo "\t&ntm    activate notams;\n\n";
     echo "\t&help    this help;\n\n";
     echo " \t\t\t\t   \n\n))";
-    exit();
+    
 }
 
+//var_dump($metarMainPart_Infos->issue_time);
 
-
-
-
+$temp_celcius =  MetarMainPart::$allMetarMainPartsByNames['temp']->result_str;
+$temp_dewpoint =  MetarMainPart::$allMetarMainPartsByNames['dew']->result_str;
+$altimeter_hg = MetarMainPart::$allMetarMainPartsByNames['baro']->result_str;
 
 //if(DEBUG)
 //{
-//    foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
-//    {
-//        //echo "\n\n";
-//        echo $name.' : ';
-//        echo '   ';
-//        echo MetarMainPart::$allMetarMainPartsByNames[$name]->result_str;
-//        echo "\n";
-//        foreach($metarMainPart_obj->subPartsByNames as $name => $metarPart_obj)
-//        {
-//            echo '   '.$name.' : ';
-//            echo $metarPart_obj->result_str;
-//            echo "\n";
-			
-//        }
-		
-//    }
+
 //}
 	//echo "\n\n";
 	//echo "\n\n";
@@ -185,34 +185,43 @@ function GetAirportNameString($icao, $lang)
 	{
 		$return_value = $GLOBALS['cityNames_array'][$icao][$lang];
 	}
-    /*var_dump($return_value);
-	echo "\n\n";
-    var_dump($icao);
-	echo "\n\n";
-    var_dump($MetarMainPart);
-	echo "\n\n";*/
+    //var_dump($return_value);
+	//echo "\n\n";
+    //var_dump($icao);
+	//echo "\n\n";
+    //var_dump($MetarMainPart);
+	//echo "\n\n";
 	return $return_value;
 }
 
-//var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str);
-
-//var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str);
-//var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str);
-
 $airportICAO = MetarMainPart::$allMetarMainPartsByNames['icao']->result_str;
 $infoLetter = strToUpper($_GET['info']);
+
 $infoPhonetic = $GLOBALS['phonetic_alphabet'][$infoLetter];
 $infoZuluTime = str_replace('Z', '', MetarMainPart::$allMetarMainPartsByNames['issue_time']->result_str);
+    //var_dump($infoZuluTime);
 $windDirection = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_deg']->result_str;
 $windVariaton = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_var']->result_str;
-$windVariatonList = explode('V', $windVariaton);
 $windSpeeds = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str;
+$windVariatonList = explode('V', $windVariaton);
+$windSpeedVariaton = explode('G', $windSpeeds);
 
-preg_match_all('/(?P<speed_kts>(?<=^)\d\d)(?:G(?P<speed_gust>(?<=G)\d\d))?KT$/', $windSpeeds, $speedMatches);
+
+//MetarMainPart::$allMetarMainPartsByNames['icao']->addSubPart(['airport_icao','issue_date','issue_time'], '/^(?<speed_kts>VRB|\d{3})(?<speed_kts>\d{2})(?:G(?<speed_kts>\d{2}))?KT$/');
+MetarMainPart::$allMetarMainPartsByNames['winds']->addSubPart(['wind_degree','wind_speed','wind_gust'], '/^(?<speed_kts>vrb|\d{3})(?<wind_speed>\d{2})(?:g(?<wind_gust>\d{2}))?kt$/');
+
+
+var_dump(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_degree']->result_str);
+(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str);
+(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str);
+
+"".utf8_decode(json_decode('"\u00A0"')).WrapLetter($infoPhonetic);
+
+//preg_match('/(?<speed_kts>\d{2})G(?<speed_gust>\d{2}?)KT(?:G(?P<speed_gust>\d\d))?KT$/', $windSpeeds, $speedMatches);
 $windSpeed_kts = +$speedMatches['speed_kts'][0];
 $windSpeed_gust = +$speedMatches['speed_gust'][0];
 
-//$visibility = str_replace('SM', '', MetarMainPart::$allMetarMainPartsByNames['issue_time']->result_str);
+$visibility = MetarMainPart::$allMetarMainPartsByNames['vis']->result_str;
 $precipitations = MetarMainPart::$allMetarMainPartsByNames['precip']->result_str;
 $precipitations_array = explode(" ", $precipitations);
 $precipitations_segmentArr = [];
@@ -309,9 +318,6 @@ foreach($clouds_array as $cloudLayer)
 }
 $cloudLayers_segmentStrFr = implode(" , ", $cloudLayers_segmentArrFr);
 $cloudLayers_segmentStrEn = implode(" , ", $cloudLayers_segmentArrEn);
-$temp_celcius =  MetarMainPart::$allMetarMainPartsByNames['temp']->result_str;
-$temp_dewpoint =  MetarMainPart::$allMetarMainPartsByNames['dew']->result_str;
-$altimeter_hg = substr(MetarMainPart::$allMetarMainPartsByNames['baro']->result_str, 1);
 $dep_rwys = $_GET['dep'];
 $dep_rwys_str = '';
 function GetAirportDepRwysString($dep_rwys, $lang)
@@ -336,6 +342,7 @@ function GetAirportAppRwysString($app_rwys, $app_type, $lang)
 	}
 	return implode(($lang === 'fr'? ' et ': ' and '), $app_rwys_list);
 }
+global $windDirection;
 if(strtoupper($windDirection) !== 'VRB')
 {
     $windDirection += 20;
@@ -361,14 +368,13 @@ if($bilingualDemanded)
 {
 
     $basicInformations = New AtisSectionConstructor();
-    var_dump($infoZuluTime);
 
     $basicInformations->addSection(  GetAirportNameString($airportICAO, 'fr').' renseignement'.json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
-    $basicInformations->addSection( 'météo à '.WrapNumberSpell(substr($infoZuluTime, -1, 4)).' Zulu' );
+    $basicInformations->addSection( 'météo à '.WrapNumberSpell(substr($infoZuluTime, 1, 4)).' Zulu' );
     $atisResultFr->addSection( $basicInformations->returnResult() );
 
     $windsEtc = New AtisSectionConstructor();
-    $windsEtc->addSection( 'vent '. ( $windDirection === 'VRB' ? 'variable' : WrapNumberSpell($windDirection) ).' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales Ã Â  '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " variant entre ".$windVariatonList[0].' et '.$windVariatonList[1] : '') );
+    $windsEtc->addSection( 'vent '. ( $windDirection === 'VRB' ? 'variable' : WrapNumberSpell($windDirection) ).' à '.WrapNumberWhole($windSpeed_kts).($windSpeed_gust > 0 ? ' rafales à '.WrapNumberWhole($windSpeed_gust) : '').(strlen($windVariaton) > 0 ? " variant entre ".$windVariatonList[0].' et '.$windVariatonList[1] : '') );
     $windsEtc->addSection( 'visibilité '.WrapNumberSpell($visibility) );
     $atisResultFr->addSection( $windsEtc->returnResult() );
 
@@ -385,7 +391,7 @@ if($bilingualDemanded)
     $atisResultFr->addSection( $clouds->returnResult() );
 
     $baroEtc = New AtisSectionConstructor();
-    $baroEtc->addSection( 'température '.WrapNumberSpell($temp_celcius) );
+    $baroEtc->addSection( 'température '.WrapNumberSpell(MetarMainPart::$allMetarMainPartsByNames['temp']->result_str).'[,] point de rosée'.WrapNumberSpell($temp_dewpoint) );
     $baroEtc->addSection( 'point de rosée '.WrapNumberSpell($temp_dewpoint) );
     $baroEtc->addSection( 'altimètre '.WrapNumberSpell($altimeter_hg) );
     $atisResultFr->addSection( $baroEtc->returnResult() );
@@ -398,9 +404,8 @@ if($bilingualDemanded)
     $notams = New AtisSectionConstructor();
     if($notamsDemanded)
     {
-	//echo "\n\n";
-	//echo "\n\n";
-	//echo "\n\n";
+	    //echo "\n\n";
+
         foreach($GLOBALS['ACTIVE_NOTAMS_IDS'] as $notam)
         {
             //var_dump($notam);
@@ -416,9 +421,6 @@ if($bilingualDemanded)
     
                 $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
 
-                //var_dump($this_notam_text);
-
-                //var_dump($this_notam_text);
                 $this_notam_text = strtolower($this_notam_text);
     
 	            $notams->addSection( $this_notam_text );
@@ -429,15 +431,14 @@ if($bilingualDemanded)
     }
 
     $ending = New AtisSectionConstructor();
-    $ending->addSection( "Avisez l'ATC que vous avez l'information".json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
+    $ending->addSection("Avisez l'ATC que vous avez l'information".json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
     $atisResultFr->addSection( $ending->returnResult() );
 
 }
 
-
-$basicInformations = New AtisSectionConstructor();
+$basicInformations = New AtisSectionConstructor("Avisez l'ATC que vous avez l'information".WrapLetter($infoPhonetic));
 $basicInformations->addSection( GetAirportNameString($airportICAO, 'en').' information'.utf8_decode(json_decode('"\u00A0"')).WrapLetter($infoPhonetic) );
-$basicInformations->addSection( 'weather at '.WrapNumberSpell(substr($infoZuluTime, -1, 4)).' Zulu' );
+$basicInformations->addSection( 'weather at '.WrapNumberSpell(substr($infoZuluTime, 1, 4)).' Zulu' );
 $atisResultEn->addSection( $basicInformations->returnResult() );
 
 $windsEtc = New AtisSectionConstructor();
@@ -458,9 +459,8 @@ if (strlen($cloudLayers_segmentStrEn) > 0 ){
 $atisResultEn->addSection( $clouds->returnResult() );
 
 $baroEtc = New AtisSectionConstructor();
-$baroEtc->addSection( 'temperature '.WrapNumberSpell($temp_celcius) );
-$baroEtc->addSection( 'dew point '.WrapNumberSpell($temp_dewpoint) );
-$baroEtc->addSection( 'altimeter '.WrapNumberSpell($altimeter_hg) );
+$baroEtc->addSection( 'temperature '.WrapNumberSpell(MetarMainPart::$allMetarMainPartsByNames['temp']->result_str).' [,] dew point '.WrapNumberSpell($temp_dewpoint) );
+$baroEtc->addSection( 'altimeter '.WrapNumberSpell(MetarMainPart::$allMetarMainPartsByNames['baro']->result_str) );
 $atisResultEn->addSection( $baroEtc->returnResult() );
 
 $procedures = New AtisSectionConstructor();
@@ -507,7 +507,7 @@ $atisResultEn->addSection( $ending->returnResult() );
 
 
 
-/*
+
 $windDirection = +$metarMatches['wind_dir'][0];
 $windDirection += 20;
 $windDirection = ($windDirection > 360)? $windDirection - 360 : $windDirection;
@@ -519,27 +519,51 @@ $outputEnglishText .= 'visibility '.$metarMatches['visibility'][0].' miles, ';
 $outputEnglishText .= $metarMatches['precipitations'][0].', ';
 $outputEnglishText .= $metarMatches['clouds'][0].', ';
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //$outputEnglishText = str_replace(["\r\n","\n","\r"], "", $outputText);
 //$outputEnglishText = str_replace(['CYUL','CYOW'], ['Montreal','Ottawa'], $outputText);
-*/
+
 
 //$outputEnglishText = $outputEnglishText.' A B C D E F G H J K L M N O P Q R S T U V W X Y Z ';
 //$outputEnglishText = $outputEnglishText;
 
-$search = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ', 'Ά', 'ά', 'Έ', 'έ', 'Ό', 'ό', 'Ώ', 'ώ', 'Ί', 'ί', 'ϊ', 'ΐ', 'Ύ', 'ύ', 'ϋ', 'ΰ', 'Ή', 'ή');
-$replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', 'Α', 'α', 'Ε', 'ε', 'Ο', 'ο', 'Ω', 'ω', 'Ι', 'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η');
 
 
-//var_dump($atisResult);
+
+
+
+
+
+
+
+
+
+
+
+$search = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', 'Œ', 'œ', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', 'Š', 'š', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', 'Ÿ', '?', '?', '?', '?', 'Ž', 'ž', '?', 'ƒ', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?');
+$replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?');
+
+
 
 $endString = '';
 
 if($bilingualDemanded) $endString .= "\r\t\t".'(('."\r".$atisResultFr->returnResult()."\t\t".'))'."\r\r\t";
 
 $endString .=  iconv('WINDOWS-1252', 'UTF-8//TRANSLIT', str_replace($search, $replace,  $atisResultEn->returnResult()));
-
-
-//echo $atisResultEn->returnResult();
 
 
 $endString = preg_replace ( '/(?<=\W|^)(\d{2}[R|D|L|G|C]?)\/(\d{2}[R|D|L|G|C]?)(?=\W|$)/' , "$1".json_decode('"\u2013"')."$2" , $endString);
@@ -549,15 +573,16 @@ $endString = iconv('UTF-8', 'WINDOWS-1252//TRANSLIT', $endString);
 
 $endString = "\t".$endString ;
 
-//echo "\t\r\t";
-//echo $outputFrenchText;
-
 if($capitalDemanded)
 {
-    echo strToUpper($endString);
+    $endString = strToUpper($endString);
 }
 
 echo $endString;
+
+
+
+
 
 /*
 
@@ -574,7 +599,7 @@ public static Regex Weather = new Regex ("^(VC)?(-|\\+)?(MI|PR|BC|DR|BL|SH|TS|FZ
 
 METAR REGEX
 
-    METAR example "CCCC YYGGggZ dddff(f)(Gfmfm) (KMH ou KT ou MPS) (dndndnVdxdxdx) VVVV(Dv) (VxVxVxVx(Dv)) ou CAVOK (RDRDR/VRVRVRVRI ou RDRDR/VRVRVR VRVVRVRVRVRI) w′w′(ww) (NsNsNshshshs ou VVhshshs ou SKC) T′T′/T′dT′d QPHPHPHPH REw'w' (WS TKOF RWYDRDR et/ou WS LDG RWYDRDR)"
+    METAR example "CCCC YYGGggZ dddff(f)(Gfmfm) (KMH ou KT ou MPS) (dndndnVdxdxdx) VVVV(Dv) (VxVxVxVx(Dv)) ou CAVOK (RDRDR/VRVRVRVRI ou RDRDR/VRVRVR VRVVRVRVRVRI) w?w?(ww) (NsNsNshshshs ou VVhshshs ou SKC) T?T?/T?dT?d QPHPHPHPH REw'w' (WS TKOF RWYDRDR et/ou WS LDG RWYDRDR)"
     https://fr.wikipedia.org/wiki/METAR
 
 
