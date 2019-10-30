@@ -99,7 +99,6 @@ if(DEBUG)
     foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
     {
         echo $name.' : ';
-    //preg_match_all($metar_regex, $metar, $matches);
         echo '   ';
         echo MetarMainPart::$allMetarMainPartsByNames[$name]->result_str;
         echo "\n";
