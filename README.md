@@ -9,7 +9,7 @@ Web Page to create ATIS text when receiving a reques
         - All caps text;
 
 
-# There different branches for different ATIS clients
+# There will be different branches for different ATIS clients
 
 
 # Other available URLs in case of outages. (not mine)
