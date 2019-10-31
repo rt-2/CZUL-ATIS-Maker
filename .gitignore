@@ -1,3 +1,6 @@
+<<<<<<< HEAD
 *.phpproj
 *.sln
-.vs/*
+.vs/*=======
+*.phpproj
+>>>>>>> parent of 5075fea... Update .gitignore
