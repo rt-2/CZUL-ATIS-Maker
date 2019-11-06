@@ -8,7 +8,7 @@
 	//
 	//
     
-    require_once(dirname(__FILE__).'/includes/definitions.inc.php');
+    //require_once(dirname(__FILE__).'/includes/definitions.inc.php');
     require_once(dirname(__FILE__).'/includes/notam.class.inc.php');
     require_once(dirname(__FILE__).'/../resources/notams.lib.inc.php');
     

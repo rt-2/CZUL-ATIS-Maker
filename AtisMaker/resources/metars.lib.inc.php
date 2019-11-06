@@ -18,6 +18,8 @@
 
 (new MetarMainPart())->SetNew('icao', '[A-Z0-9]{4}');
 (new MetarMainPart())->SetNew('issue_time', '\d{6}Z');
+(new MetarMainPart())->SetNew('auto', 'AUTO', false);
+(new MetarMainPart())->SetNew('three_letter_what', '[A-Z]{3}', false);
 (new MetarMainPart())->SetNew('winds', '(?:VRB|\d{3})\d{2}(?:G\d{2})?KT');
 (new MetarMainPart())->SetNew('wind_var', '\d{3}V\d{3}', false);
 (new MetarMainPart())->SetNew('vis', 'CAVOK|(?:(?:\d{0,2})?\s?(?:\d\/\d)?)(?:SM)');
@@ -26,7 +28,8 @@
 (new MetarMainPart())->SetNew('clouds', '(?:SKC|CLR)|(?:\s?(?:FEW|BKN|SCT|OVC)\d{3}){0,}', false);
 (new MetarMainPart())->SetNew('vert_vis', '(?<=VV)\d{3}', false);
 (new MetarMainPart())->SetNew('temp', 'M?\d{2}');
-(new MetarMainPart())->SetNew('dew', 'M?\d{2}');
+(new MetarMainPart())->SetNew('tmp_sep', '\/');
+(new MetarMainPart())->SetNew('dew', '(?<=\/)M?\d{2}');
 (new MetarMainPart())->SetNew('baro', '(?:A|Q)\d{4}');
 (new MetarMainPart())->SetNew('precip_recent', '(?:\s?RE(?:[A-Z]{2,4}))*', false);
 (new MetarMainPart())->SetNew('windshear', 'WS\s(?:ALL RWY|(?:(?:TKOF RWY|LDG RWY)\d{2}[R|C|L]))', false);

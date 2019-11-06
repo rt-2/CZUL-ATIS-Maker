@@ -1,6 +1,6 @@
 <?php
 
-?>$GLOBALS['notams_array'] = [
+$GLOBALS['notams_array'] = [
 	'CYUL' => [
 		[
 			'en' => 'RWY 06L/24R CLSD',
@@ -70,3 +70,5 @@ $GLOBALS['phonetic_alphabet'] = [
 	'Y' => 'YANKEE',
 	'Z' => 'ZULU',
 ];
+
+?>

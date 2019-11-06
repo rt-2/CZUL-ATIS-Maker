@@ -12,32 +12,44 @@ function WrapNumberWhole($infoNumber)
     $sign = '';
 	return $sign.$infoNumber;
 };
-function WrapNumberSpell($infoNumber)
+function WrapNumberSpell($numberToWrap)
 {
     $return_str = '';
-    $num_for_str_results = (string)$infoNumber;
-    $num_for_str_tests = preg_replace ( "/^0*(?=[0-9]+)/" , '' , $num_for_str_results );
-    $num_for_int_tests = +$infoNumber;
-    $num_negative = ($num_for_int_tests < 0)? true : false;
-    if((string)+$num_for_str_tests === (string)$num_for_str_tests)
-    {
-        //$sep = "\t"; $sign = '*';
-        $sep = ""; $sign = "";
-        $length = strlen($num_for_str_results);
-        $return_str .= $sep;
-        for ($i=0; $i < $length; $i++) {
-            $return_str .= $sign.+$num_for_str_results[$i].$sep;
-        }
-        if($num_negative)
-        {
-            $return_str= 'minus '.$return_str;
-        }
-    }
-    else
-    {
+
+
+    $num_for_str = (string)$numberToWrap;
     
-	    $return_str = $num_for_str_results;
-    }
+    $num_negative = (strlen(preg_replace ( "/^(-?)[0-9]+$/" , "$1" , $numberToWrap )) > 0);
+    $num_for_str = preg_replace ( "/^-?([0-9]+)$/" , "$1" , $numberToWrap );
+
+    $num_for_int_str = (string)$num_for_str;
+    $sign = ''; $sep = '';
+
+    $num_for_int_str = $sign.$sep.implode($sep, str_split($num_for_int_str));
+
+    $return_str = ( $num_negative === true ? "minus $num_for_int_str" : $num_for_int_str );
+    
+	return $return_str;
+};
+function WrapNumberRead($numberToWrap)
+{
+    $return_str = '';
+
+
+    $num_for_str = (string)$numberToWrap;
+    $num_for_int = +$numberToWrap;
+    
+    $num_negative = (strlen(preg_replace ( "/^(-?)[0-9]+$/" , "$1" , $numberToWrap )) > 0);
+    $num_for_str = preg_replace ( "/^-?([0-9]+)$/" , "$1" , $numberToWrap );
+    $num_for_int = preg_replace ( "/^-?0*([0-9]+)$/" , "$1" , $numberToWrap );
+
+    $num_for_int_str = (string)$num_for_int;
+    $sign = ''; $sep = '';
+
+    $num_for_int_str = $sign.$sep.implode($sep, str_split($num_for_int_str));
+
+    $return_str = ( $num_negative === true ? "minus $num_for_int_str" : $num_for_int_str );
+    
 	return $return_str;
 };
 ?>
