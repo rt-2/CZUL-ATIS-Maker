@@ -44,7 +44,7 @@ function WrapNumberRead($numberToWrap)
     $num_for_int = preg_replace ( "/^-?0*([0-9]+)$/" , "$1" , $numberToWrap );
 
     $num_for_int_str = (string)$num_for_int;
-    $sign = ''; $sep = '';
+    $sign = '*'; $sep = '';
 
     $num_for_int_str = $sign.$sep.implode($sep, str_split($num_for_int_str));
 
