@@ -386,7 +386,7 @@ if($bilingualDemanded)
 
     $windsEtc = New AtisSectionConstructor();
     $windsEtc->addSection( 'vent '. ( $windDirection === 'VRB' ? 'variable' : WrapNumberSpell($windDirection) ).' à '.WrapNumberRead($windSpeeds).(+$windGusts > 0 ? ' rafales à '.WrapNumberRead($windGusts) : '').(strlen($windVariaton) > 0 ? " variant entre ".WrapNumberSpell($windVariatonList[0]).' et '.WrapNumberSpell($windVariatonList[1]) : '') );
-    $windsEtc->addSection( 'visibilité '.WrapNumberSpell($visibility) );
+    $windsEtc->addSection( ( $visibility === 'CAVOK' ? 'plafond et visibilité sont OK' : 'visibilité '.WrapNumberSpell($visibility) ) );
     $atisResultFr->addSection( $windsEtc->returnResult() );
 
     $precip = New AtisSectionConstructor();
@@ -424,16 +424,19 @@ if($bilingualDemanded)
             if(in_array($notam->GetIdent(), $GLOBALS['RECCOM_NOTAMS_IDS']))
             {
                 $this_notam_text =  $notam->GetText();
-
+                
     if(DEBUG) echo "\n\n\$this_notam_text\n";
     //if(DEBUG) var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
     if(DEBUG) echo json_encode($this_notam_text);
-                $this_notam_text = NotamTextTranslations::TranslateText($this_notam_text);
+                $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
     if(DEBUG) echo "\n\$this_notam_text_trans\n";
     //if(DEBUG) var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
     if(DEBUG) echo json_encode($this_notam_text);
-                $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
-                $this_notam_text = strtolower_utf8($this_notam_text);
+                $this_notam_text = NotamTextTranslations::TranslateText($this_notam_text);
+    if(DEBUG) echo "\n\$this_notam_text\n";
+    //if(DEBUG) var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
+    if(DEBUG) echo json_encode($this_notam_text);
+                $this_notam_text = mb_strtolower($this_notam_text);
 	            $notams->addSection( $this_notam_text );
             }
         }
@@ -455,7 +458,7 @@ $atisResultEn->addSection( $basicInformations->returnResult() );
 
 $windsEtc = New AtisSectionConstructor();
 $windsEtc->addSection( 'wind '. ( $windDirection === 'VRB' ? 'Variable' : WrapNumberSpell($windDirection) ).' at '.WrapNumberRead($windSpeeds).(+$windGusts > 0 ? ' , gusting '.WrapNumberRead($windGusts) : '').(strlen($windVariaton) > 0 ? " , varying between ".WrapNumberSpell($windVariatonList[0]).' and '.WrapNumberSpell($windVariatonList[1]) : '') );
-$windsEtc->addSection( 'visibility '.WrapNumberSpell($visibility) );
+$windsEtc->addSection( ( $visibility === 'CAVOK' ? 'ceiling and visibility are OK' : 'visibility '.WrapNumberSpell($visibility) ) );
 $atisResultEn->addSection( $windsEtc->returnResult() );
 
 $precip = New AtisSectionConstructor();
@@ -576,7 +579,7 @@ $endString = "\t".$endString ;
 
 if($capitalDemanded)
 {
-    $endString = strToUpper($endString);
+    $endString = mb_strtoupper($endString, 'WINDOWS-1252');
 }
 
 echo $endString;

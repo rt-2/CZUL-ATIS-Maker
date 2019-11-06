@@ -30,7 +30,8 @@
 (new MetarMainPart())->SetNew('temp', 'M?\d{2}');
 (new MetarMainPart())->SetNew('tmp_sep', '\/');
 (new MetarMainPart())->SetNew('dew', '(?<=\/)M?\d{2}');
-(new MetarMainPart())->SetNew('baro', '(?:A|Q)\d{4}');
+(new MetarMainPart())->SetNew('baro_unit', '(?:A|Q)');
+(new MetarMainPart())->SetNew('baro', '\d{4}');
 (new MetarMainPart())->SetNew('precip_recent', '(?:\s?RE(?:[A-Z]{2,4}))*', false);
 (new MetarMainPart())->SetNew('windshear', 'WS\s(?:ALL RWY|(?:(?:TKOF RWY|LDG RWY)\d{2}[R|C|L]))', false);
 (new MetarMainPart())->SetNew('rmk', '(?:\sRMK\s).*');

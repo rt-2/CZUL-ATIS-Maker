@@ -34,10 +34,11 @@ class NotamTextAdjustments {
             //var_dump($abbrev->getRegex());
 
             //var_dump($abbrev->getWord());
-
+            
             //echo '<br><br>';
             $this_str = preg_replace ( $abbrev->getRegex() , $abbrev->getWord() , $this_str);
         }
+
         return $this_str;
     }
     
