@@ -12,15 +12,17 @@ class Notam
 
     public function __construct($configArray) {
     
-    
-        if(isset($configArray['ident'])) $this->ident = $configArray['ident'];
+
         if(isset($configArray['ident'])) $this->ident = $configArray['ident'];
         if(isset($configArray['airport'])) $this->airport = $configArray['airport'];
         if(isset($configArray['time_from'])) $this->time_from = $configArray['time_from'];
         if(isset($configArray['time_to'])) $this->time_to = $configArray['time_to'];
-        if(isset($configArray['time_human'])) $this->time_human = $configArray['time_human'];
         if(isset($configArray['text'])) $this->text = $configArray['text'];
-
+        if(isset($configArray['time_human'])) $this->text .= ' '.$configArray['time_human'];
+        
+        $this->text = str_replace ( ',' , '' , $this->text);
+        $this->text = str_replace ( '.' , '' , $this->text);
+        $this->text = str_replace ( PHP_EOL  , '' , $this->text);
 
 
     }

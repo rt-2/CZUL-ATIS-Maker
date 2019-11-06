@@ -5,11 +5,11 @@ header('Content-Type: text/plain; charset=WINDOWS-1252');
 //header('Content-Type: text/plain; charset=UTF-8');
 
     require_once(dirname(__FILE__).'/includes/definitions.inc.php');
+    require_once(dirname(__FILE__).'/includes/functions.inc.php');
 
     require_once(dirname(__FILE__).'/includes/notam.class.inc.php');
     require_once(dirname(__FILE__).'/includes/atis.class.inc.php');
     require_once(dirname(__FILE__).'/includes/metar.class.inc.php');
-    require_once(dirname(__FILE__).'/includes/functions.inc.php');
     require_once(dirname(__FILE__).'/includes/curl.class.inc.php');
 
     require_once(dirname(__FILE__).'/includes/CANotAPI/CANotAPI.inc.php');
@@ -57,6 +57,7 @@ $winds_regex = '/(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z\s(?P<
 
 global $atisEnabledAirports;
 $GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
+$GLOBALS['RECCOM_NOTAMS_IDS'] = [];
 
 
 $notamsDemanded = isset($_GET['ntm']);
@@ -135,8 +136,8 @@ if($helpDemanded)
 
 //var_dump($metarMainPart_Infos->issue_time);
 
-$temp_celcius =  preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['temp']->result_str );
-$temp_dewpoint =  preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['dew']->result_str );
+$temp_celcius =  +preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['temp']->result_str );
+$temp_dewpoint =  +preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['dew']->result_str );
 $altimeter_hg = MetarMainPart::$allMetarMainPartsByNames['baro']->result_str;
 
 //if(DEBUG)
@@ -148,32 +149,7 @@ $altimeter_hg = MetarMainPart::$allMetarMainPartsByNames['baro']->result_str;
 	//echo json_encode($matches);
 
 
-    
-if($notamsDemanded)
-{
-    //Fetch NOTAMs
-    $notamsIds = file('../Notams/activeNotams.data.csv');
-    //echo "\nnotamsIds\n";
-    //var_dump($notamsIds);
-    foreach($notamsIds as $value)
-    {
-        if(DEBUG) echo "\nvalue\n";
-        if(DEBUG) var_dump($value);
-        
-        $notam_id = trim(preg_replace("/(;.*$)/", '', $value));
-        //var_dump($notam_id);
-        if(strlen($notam_id) > 0)
-        {
-            $GLOBALS['ACTIVE_NOTAMS_IDS'][] = $notam_id;
-        }
-    }
-    //echo "\nACTIVE_NOTAMS_IDS\n";
-    if(DEBUG) var_dump($airportICAO);
-    //
-    $GLOBALS['ACTIVE_NOTAMS_IDS'] = CANotAPI_GetNotamsArray($airportICAO, 'CLSD');
-    //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
-    //var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
-}
+  
 
  //echo "\n\n"; echo "\n\n";
 if(DEBUG)
@@ -357,7 +333,38 @@ if(strtoupper($windDirection) !== 'VRB')
     }
 }
 
-
+  
+if($notamsDemanded)
+{
+    if(DEBUG) echo "\nRECCOM_NOTAMS_IDS\n";
+    //Fetch NOTAMs
+    $notamsIds = file('../Notams/activeNotams.data.csv');
+    //echo "\nnotamsIds\n";
+    //if(DEBUG) echo json_encode($notamsIds);
+    foreach($notamsIds as $value)
+    {
+        //if(DEBUG) echo "\nvalue\n";
+        //if(DEBUG) echo json_encode($value);
+        
+        $notam_id = trim(preg_replace("/\;.*$/mu", '', $value));
+        //var_dump($notam_id);
+        if(strlen($notam_id) > 0)
+        {
+            //if(DEBUG) echo "\n";
+            //if(DEBUG) echo json_encode($notam_id);
+            $GLOBALS['RECCOM_NOTAMS_IDS'][] = $notam_id;
+        }
+    }
+    if(DEBUG) echo json_encode($GLOBALS['RECCOM_NOTAMS_IDS']);
+    //echo "\nACTIVE_NOTAMS_IDS\n";
+    if(DEBUG) var_dump($airportICAO);
+    //
+    $GLOBALS['ACTIVE_NOTAMS_IDS'] = CANotAPI_GetNotamsArray($airportICAO, ' ');
+    //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
+    if(DEBUG) echo "\nACTIVE_NOTAMS_IDS\n";
+    //if(DEBUG) var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
+    if(DEBUG) echo json_encode($GLOBALS['ACTIVE_NOTAMS_IDS']);
+}
 
 
 
@@ -404,35 +411,36 @@ if($bilingualDemanded)
     $procedures->addSection( 'approches IFR '.GetAirportAppRwysString($app_rwys, $app_type, 'fr') );
     $procedures->addSection( 'départs '.GetAirportDepRwysString($dep_rwys, 'fr') );
     $atisResultFr->addSection( $procedures->returnResult() );
-
+    
     $notams = New AtisSectionConstructor();
     if($notamsDemanded)
     {
-	    //echo "\n\n";
-
+    
+    if(DEBUG) echo "\n\n\$this_notam_text|ACTIVE_NOTAMS_IDS\n";
+    //if(DEBUG) var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
+    if(DEBUG) echo json_encode($GLOBALS['ACTIVE_NOTAMS_IDS']);
         foreach($GLOBALS['ACTIVE_NOTAMS_IDS'] as $notam)
         {
-            //var_dump($notam);
-    
-	        //echo "\nddddd\n";
-            //var_dump($notam->GetIdent());
-            //var_dump($GLOBALS['ACTIVE_NOTAMS_IDS']);
-    
-	        //echo "\n\n";
-            if(in_array($notam->GetIdent(), $atisEnabledAirports))
+            if(in_array($notam->GetIdent(), $GLOBALS['RECCOM_NOTAMS_IDS']))
             {
-                $this_notam_text = $notam->GetText();
-    
-                $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
+                $this_notam_text =  $notam->GetText();
 
-                $this_notam_text = strtolower($this_notam_text);
-    
+    if(DEBUG) echo "\n\n\$this_notam_text\n";
+    //if(DEBUG) var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
+    if(DEBUG) echo json_encode($this_notam_text);
+                $this_notam_text = NotamTextTranslations::TranslateText($this_notam_text);
+    if(DEBUG) echo "\n\$this_notam_text_trans\n";
+    //if(DEBUG) var_dump( $GLOBALS['ACTIVE_NOTAMS_IDS']);
+    if(DEBUG) echo json_encode($this_notam_text);
+                $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
+                $this_notam_text = strtolower_utf8($this_notam_text);
 	            $notams->addSection( $this_notam_text );
             }
         }
-        $atisResultFr->addSection( $notams->returnResult() );
+
 
     }
+    $atisResultFr->addSection( $notams->returnResult() );
 
     $ending = New AtisSectionConstructor();
     $ending->addSection("Avisez l'ATC que vous avez l'information".json_decode('"\u00A0"').WrapLetter($infoPhonetic) );
@@ -479,30 +487,18 @@ if($notamsDemanded)
 
     foreach($GLOBALS['ACTIVE_NOTAMS_IDS'] as $notam)
     {
-        if(in_array($notam->GetIdent(), $atisEnabledAirports))
+        if(in_array($notam->GetIdent(), $GLOBALS['RECCOM_NOTAMS_IDS']))
         {
             $this_notam_text =  $notam->GetText();
-    
-            //var_dump($this_notam_text);
             $this_notam_text = NotamTextAdjustments::AdjustAndReturnText($this_notam_text);
-
-            //var_dump($this_notam_text);
             $this_notam_text = strtolower($this_notam_text);
-    
-                    //echo '<br><br>'."\n\n";
-                    //echo '<br><br>'."\n\n";
-                    //echo '<br><br>'."\n\n";
-
-    
-            //$this_notam_text[0] = strtoupper($this_notam_text[0]);
-
 	        $notams->addSection( $this_notam_text );
         }
     }
 
 
 }
-    $atisResultEn->addSection( $All_Notams_man_Txt );
+$atisResultEn->addSection( $notams->returnResult() );
 
 //var_dump($atisResult);
 $ending = New AtisSectionConstructor();
