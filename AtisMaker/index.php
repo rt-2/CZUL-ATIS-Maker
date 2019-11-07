@@ -338,7 +338,7 @@ if($notamsDemanded)
 {
     if(DEBUG) echo "\nRECCOM_NOTAMS_IDS\n";
     //Fetch NOTAMs
-    $notamsIds = file('../Notams/activeNotams.data.csv');
+    $notamsIds = file('../ACTIVE_NOTAMS_IDS.data.csv');
     //echo "\nnotamsIds\n";
     //if(DEBUG) echo json_encode($notamsIds);
     foreach($notamsIds as $value)

@@ -58,6 +58,7 @@ $firAirports = [
     'CYHU' => 'Montréal/Saint-Hubert',
     'CYQB' => 'Québec City/Jean Lesage International',
     'CYOW' => 'Ottawa/Macdonald-Cartier International',
+    'CYRC' => 'Chicoutimi/St-Honoré',
 
     // Class D
     'CYJN' => 'St-Jean',
@@ -90,7 +91,6 @@ $firAirports = [
     'CYRQ' => 'Trois-Rivières',
     'CYRJ' => 'Roberval',
     'CYRI' => 'Rivière-du-Loup',
-    'CYRC' => 'Chicoutimi/St-Honoré',
     'CYPX' => 'Puvirnituq',
     'CYPP' => 'Parent',
     'CYPN' => 'Port-Menier',
