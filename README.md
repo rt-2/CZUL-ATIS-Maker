@@ -7,6 +7,8 @@ Web Page to create ATIS text when receiving a reques
         - Bilingual ATIS (Text, voice will only be english);
 
         - All caps text;
+
+        - NOTAMs;
         
 
 # Other available URLs in case of outages. (not mine)
