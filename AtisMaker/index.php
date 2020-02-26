@@ -258,9 +258,9 @@ foreach($precipitations_array as $precipitation)
 	}
 }
 
-if(count($precipitations_segmentArrFr) > 0) $precipitations_segmentStrFr = implode(" , ", $precipitations_segmentArrFr);
+if(!is_null($precipitations_segmentArrFr) && count($precipitations_segmentArrFr) > 0) $precipitations_segmentStrFr = implode(" , ", $precipitations_segmentArrFr);
 
-if(count($precipitations_segmentArrEn) > 0) $precipitations_segmentStrEn = implode(" , ", $precipitations_segmentArrEn);
+if(!is_null($precipitations_segmentArrEn) && count($precipitations_segmentArrEn) > 0) $precipitations_segmentStrEn = implode(" , ", $precipitations_segmentArrEn);
 
 $clouds = MetarMainPart::$allMetarMainPartsByNames['clouds']->result_str;
 $clouds_array = explode(" ", $clouds);
