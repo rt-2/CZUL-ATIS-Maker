@@ -190,6 +190,8 @@ $windVariaton = MetarMainPart::$allMetarMainPartsByNames['wind_var']->result_str
 $windSpeeds = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str;
 $windGusts = MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_gust']->result_str;
 
+$windGusts = @+$windGusts;
+
 $windVariatonList = explode('V', $windVariaton);
 
 
