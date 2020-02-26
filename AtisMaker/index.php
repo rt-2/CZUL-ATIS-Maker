@@ -567,7 +567,11 @@ $replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I
 
 $endString = '';
 
-if($bilingualDemanded) $endString .= "\r\t\t".'(('."\r".$atisResultFr->returnResult()."\t\t".'))'."\r\r\t";
+if($bilingualDemanded) {
+	$atisResultFrStr = $atisResultFr->returnResult();
+	$atisResultFrStr = str_replace(' minus ', ' moin ',  $atisResultFrStr);
+	$endString .= "\r\t\t".'(('."\r".$atisResultFrStr->returnResult()."\t\t".'))'."\r\r\t";
+}
 
 $endString .=  iconv('WINDOWS-1252', 'UTF-8//TRANSLIT', str_replace($search, $replace,  $atisResultEn->returnResult()));
 
