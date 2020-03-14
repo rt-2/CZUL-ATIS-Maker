@@ -1,5 +1,5 @@
 # CZUL-ATIS-Maker
-Web Page to create ATIS text when receiving a reques
+Web Page to create ATIS text when receiving a request
 
 
 # Approved features (options):
