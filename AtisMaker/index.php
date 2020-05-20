@@ -1,65 +1,38 @@
 <?php
-// Euroscope Compatibility
+
+// Header(s)
+//Euroscope Compatibility
 header('Content-Type: text/plain; charset=WINDOWS-1252');
-//header('Content-Type: text/plain; charset=ISO-8859-1');
-//header('Content-Type: text/plain; charset=UTF-8');
 
-    require_once(dirname(__FILE__).'/includes/definitions.inc.php');
-    require_once(dirname(__FILE__).'/includes/functions.inc.php');
-
-    require_once(dirname(__FILE__).'/includes/notam.class.inc.php');
-    require_once(dirname(__FILE__).'/includes/atis.class.inc.php');
-    require_once(dirname(__FILE__).'/includes/metar.class.inc.php');
-    require_once(dirname(__FILE__).'/includes/curl.class.inc.php');
-
-    require_once(dirname(__FILE__).'/includes/CANotAPI/CANotAPI.inc.php');
-
-    require_once(dirname(__FILE__).'/resources/metars.lib.inc.php');
-    require_once(dirname(__FILE__).'/resources/airports.lib.inc.php');
-    require_once(dirname(__FILE__).'/resources/fir.data.inc.php');
-    
-    
-
-
-
+// Init(s)
+//Config(s)
+require_once(dirname(__FILE__).'/includes/definitions.inc.php');
+require_once(dirname(__FILE__).'/includes/functions.inc.php');
+//Ressources(s)
+require_once(dirname(__FILE__).'/includes/notam.class.inc.php');
+require_once(dirname(__FILE__).'/includes/atis.class.inc.php');
+require_once(dirname(__FILE__).'/includes/metar.class.inc.php');
+require_once(dirname(__FILE__).'/includes/curl.class.inc.php');
+//Dependencies(s)
+require_once(dirname(__FILE__).'/includes/CANotAPI/CANotAPI.inc.php');
+//Libraries(s)
+require_once(dirname(__FILE__).'/resources/metars.lib.inc.php');
+require_once(dirname(__FILE__).'/resources/airports.lib.inc.php');
+require_once(dirname(__FILE__).'/resources/fir.data.inc.php');
+//Global(s)
+global $windDirection;
+global $atisEnabledAirports;
+//Constant(s)
+define('DEBUG', isset($_GET['debug']) );
+$GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
+$GLOBALS['RECCOM_NOTAMS_IDS'] = [];
+//Var(s)
 $metarMatches = [];
 $metar = $_GET['metar'];
 $metarMainParts = [];
 $metarMainPartStrings = [];
-
-define('DEBUG', isset($_GET['debug']) );
-if(DEBUG) "Debug Mode ON.\n\n";
-
-
-$metar_regex = '';
-foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
-{
-	
-    $metar_regex .= $metarMainPart_obj->regex."\s?";
-}
-$metar_regex = "/".$metar_regex."/mu";
-
-//echo "metar_regex";
-//echo $metar_regex;
-//echo "\n\n";
-
-
-//$req = new HttpCurl();
-//$req->get('http://rt2.czulfir.com/AtisMaker/?apptype=ILS&fr&ntm&metar='.urlencode('CYUL%20291132Z%2034003KT%202%201/2SM%20BCFG%20BKN001%20BKN250%2004/04%20A3018%20RMK%20SF5CI2%20VIS%20S%20W%20N%201/2%20SLP223').'&arr=24L&dep=24L&info=H&arr=24L&dep=24L&info=H');
-
-//echo $req->getBody();
-/*
-$main_local_regex.'\s?'.$main_wind_regex.'\s?'.$main_visibility_regex.'\s?'.$main_precipitation_regex.'\s?'.$main_cloud_regex.'\s?'.$main_temp_regex.'\s?'.$main_altimeter_regex.'\s?RMK\s'.$main_remark_regex;
-$winds_regex = '/(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z\s(?P<winds>\d{5}(?:G\d{2})?KT)\s(?P<visibility>\d{1,2})SM\s(?P<precipitations>(?:(?:(?:\-|\+)?[A-Z]{2})\s){0,})(?P<clouds>(?:(?:FEW|BKN|SCT|OVC)\d{3}\s){0,})(?P<temperature>\d{2})\/(?P<dewPoint>\d{2})\sA(?P<altimeter>\d{4}) RMK (?P<remarks>[[:ascii:]]*)';
-*/
-//(?P<icao>\w{4})\s(?P<time_day>\d{2})(?P<time_zulu>\d{4})Z
-
-
-global $atisEnabledAirports;
-$GLOBALS['ACTIVE_NOTAMS_IDS'] = [];
-$GLOBALS['RECCOM_NOTAMS_IDS'] = [];
-
-
+$metarMainPart_Infos = [];
+//Input(s)
 $notamsDemanded = isset($_GET['ntm']);
 $bilingualDemanded = isset($_GET['fr']);
 $upperCaseDemanded = isset($_GET['cap']);
@@ -67,10 +40,33 @@ $bilingualDemanded = isset($_GET['fr']);
 $capitalDemanded = isset($_GET['cap']);
 $helpDemanded = isset($_GET['help']);
 
+// Functions
+//GetAirportNameString - Get a clean(ready for voice) airport name from a ICAO
+function GetAirportNameString($icao, $lang)
+{
+	$return_value = '['.$icao.']';
+	if(@strlen($GLOBALS['cityNames_array'][$icao][$lang]) > 0)
+	{
+		$return_value = $GLOBALS['cityNames_array'][$icao][$lang];
+	}
+	return $return_value;
+}
 
+// Debug(s)
+if(DEBUG) "Debug Mode ON.\n\n";
+
+// Construct complete regex from parts
+$metar_regex = '';
+foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
+{
+    $metar_regex .= $metarMainPart_obj->regex."\s?";
+}
+$metar_regex = "/".$metar_regex."/mu";
+
+// Decode METAR
 preg_match_all($metar_regex, $metar, $matches);
 
-
+// Debug(s)
 if(DEBUG)
 {
 	echo "\n\n";
@@ -90,18 +86,17 @@ if(DEBUG)
 	echo "\nmatches :\n";
 	echo count(MetarMainPart::$allMetarMainPartsByNames);
 	echo "\n\n";
-    var_dump($matches);
+    	var_dump($matches);
 	echo "\n\n";
 }
-    //(?:\sRMK\s).*
 
-    $metarMainPart_Infos = [];
-    foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
-    {
-	    $metarMainPart_Infos[$name] = $metarMainPart_obj->SetResultString($matches[$name][0]);
-    }
+// Seperate all regex matches into vars
+foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
+{
+    $metarMainPart_Infos[$name] = $metarMainPart_obj->SetResultString($matches[$name][0]);
+}
 
-
+// Debug(s)
 if(DEBUG)
 {
     foreach(MetarMainPart::$allMetarMainPartsByNames as $name => $metarMainPart_obj)
@@ -120,10 +115,7 @@ if(DEBUG)
     }
 }
 
-
-
-
-
+// Help
 if($helpDemanded)
 {
     echo "(( \r\t\t Commands:\n\n\n";
@@ -134,24 +126,7 @@ if($helpDemanded)
     
 }
 
-//var_dump($metarMainPart_Infos->issue_time);
-
-$temp_celcius =  +preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['temp']->result_str );
-$temp_dewpoint =  +preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['dew']->result_str );
-$altimeter_hg = MetarMainPart::$allMetarMainPartsByNames['baro']->result_str;
-
-//if(DEBUG)
-//{
-
-//}
-	//echo "\n\n";
-	//echo "\n\n";
-	//echo json_encode($matches);
-
-
-  
-
- //echo "\n\n"; echo "\n\n";
+// Debug(s)
 if(DEBUG)
 {
 	echo "\n\n";
@@ -159,23 +134,7 @@ if(DEBUG)
 	echo "\n\n";
 }
 
-
-function GetAirportNameString($icao, $lang)
-{
-	$return_value = '['.$icao.']';
-	if(@strlen($GLOBALS['cityNames_array'][$icao][$lang]) > 0)
-	{
-		$return_value = $GLOBALS['cityNames_array'][$icao][$lang];
-	}
-    //var_dump($return_value);
-	//echo "\n\n";
-    //var_dump($icao);
-	//echo "\n\n";
-    //var_dump($MetarMainPart);
-	//echo "\n\n";
-	return $return_value;
-}
-
+// Prepare all information for voice
 $airportICAO = MetarMainPart::$allMetarMainPartsByNames['icao']->result_str;
 $infoLetter = strToUpper($_GET['info']);
 
@@ -194,14 +153,9 @@ $windGusts = @+$windGusts;
 
 $windVariatonList = explode('V', $windVariaton);
 
-
-
-//(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_variaton']->result_str);
-//(MetarMainPart::$allMetarMainPartsByNames['winds']->subPartsByNames['wind_speed']->result_str);
-
-//"".utf8_decode(json_decode('"\u00A0"')).WrapLetter($infoPhonetic);
-
-//preg_match('/(?<speed_kts>\d{2})G(?<speed_gust>\d{2}?)KT(?:G(?P<speed_gust>\d\d))?KT$/', $windSpeeds, $speedMatches);
+$temp_celcius =  +preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['temp']->result_str );
+$temp_dewpoint =  +preg_replace( "/^M/" , '-' , MetarMainPart::$allMetarMainPartsByNames['dew']->result_str );
+$altimeter_hg = MetarMainPart::$allMetarMainPartsByNames['baro']->result_str;
 
 $visibility = preg_replace ( "/SM$/" , '' , MetarMainPart::$allMetarMainPartsByNames['vis']->result_str);
 $precipitations = MetarMainPart::$allMetarMainPartsByNames['precip']->result_str;
@@ -324,7 +278,7 @@ function GetAirportAppRwysString($app_rwys, $app_type, $lang)
 	}
 	return implode(($lang === 'fr'? ' et ': ' and '), $app_rwys_list);
 }
-global $windDirection;
+
 if(strtoupper($windDirection) !== 'VRB')
 {
     $windDirection += 20;
@@ -335,7 +289,7 @@ if(strtoupper($windDirection) !== 'VRB')
     }
 }
 
-  
+
 if($notamsDemanded)
 {
     if(DEBUG) echo "\nRECCOM_NOTAMS_IDS\n";
