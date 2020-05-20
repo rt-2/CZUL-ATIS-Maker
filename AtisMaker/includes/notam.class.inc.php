@@ -15,27 +15,14 @@ class NotamTextAdjustments {
         $this->abbrev = $abbrevStr;
         $this->word = $wordStr;
         $this->regex = $abbrevStr;
-        //echo 'ended';
-        //echo 'ended';
-        //echo 'ended';
         self::$all_abbrevs[] = serialize($this);
-
     }
     
     static public function AdjustAndReturnText($this_str) {
     
-           //var_dump(self::$all_abbrevs);
         foreach(self::$all_abbrevs as $abbrev)
         {
             $abbrev= unserialize($abbrev);
-
-            //var_dump($abbrev);
-
-            //var_dump($abbrev->getRegex());
-
-            //var_dump($abbrev->getWord());
-            
-            //echo '<br><br>';
             $this_str = preg_replace ( $abbrev->getRegex() , $abbrev->getWord() , $this_str);
         }
 
@@ -61,7 +48,7 @@ class NotamTextTranslations {
     private $word_before = null;
     private $word_after = null;
     private $regex = null;
-
+    
     public function __construct($wordBefore, $wordAfter) {
         
         $this->word_before = $wordBefore;
@@ -70,7 +57,7 @@ class NotamTextTranslations {
         self::$all_translations[] = serialize($this);
 
     }
-    
+    //
     static public function TranslateText($this_str) {
     
         foreach(self::$all_translations as $translation)
@@ -84,24 +71,22 @@ class NotamTextTranslations {
 
         return $this_str;
     }
-    
+    //
     public function GetWordBefore()
     {
         return $this->word_before;
     }
+    //
     public function GetWordAfter()
     {
         return $this->word_after;
     }
-
+    //
     public function GetRegex()
     {
         return $this->regex;
     }
-
-
+    
 }
-
-
 
 ?>
