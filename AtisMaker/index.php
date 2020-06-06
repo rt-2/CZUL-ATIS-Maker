@@ -226,7 +226,7 @@ foreach($clouds_array as $cloudLayer)
 	$type = substr($cloudLayer, 0, 3);
     //$unit = '(fr)';
     $unit = '';
-	$alt = WrapNumberRead((+substr($cloudLayer, 3, 3)).'00').$unit;
+	$alt = WrapNumberRead((@+substr($cloudLayer, 3, 3)).'00').$unit; //TODO: Fix this warning
     
 	$retStrFr = '';
 	$retStrEn = '';
