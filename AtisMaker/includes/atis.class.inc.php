@@ -59,7 +59,7 @@ class AtisSectionConstructor {
     
     public static $HEAD = "";
     public static $SEP = " [,] ";
-    public static $FOOT = " [;] ";
+    public static $FOOT = " [,] "; // Used to be [;] but the voice recorder can't handle those anymore...
 
     public $all_sections = [];
 
